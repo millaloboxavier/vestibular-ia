@@ -169,7 +169,7 @@
     const text = String(value || "").trim();
     if (!text) return "";
     if (/consultar página|página do curso|site oficial/i.test(text)) return "";
-    return text;
+    return text.replace(/\s*indicado\s+na\s+página(\s+de\s+processo\s+seletivo)?/i, "").trim();
   }
 
   function setSuggestions(items = defaultSuggestions) {
@@ -220,9 +220,13 @@
   }
 
   async function search(value, options = {}) {
-    const message = String(value || $("#query").value || $("#topQuery").value || "").trim();
+    const topVisible = $("#topSearch").classList.contains("show");
+    const activeId = document.activeElement?.id;
+    const typedValue = activeId === "topQuery" ? $("#topQuery").value : activeId === "query" ? $("#query").value : topVisible ? $("#topQuery").value : $("#query").value;
+    const message = String(value || typedValue || "").trim();
     if (!message) return;
 
+    // Toda nova digitação reinicia o contexto anterior. A IA recebe apenas a pergunta atual.
     if (!options.fromAction) {
       $("#query").value = message;
       $("#topQuery").value = message;
@@ -283,6 +287,7 @@
   function renderSection(section) {
     if (!section || !section.type) return "";
     if (section.type === "course_cards") return renderCourseCards(section);
+    if (section.type === "course_detail") return renderCourseDetail(section);
     if (section.type === "timeline") return renderTimeline(section);
     if (section.type === "admission_options") return renderAdmissionOptions(section);
     if (section.type === "events") return renderEvents(section);
@@ -311,6 +316,12 @@
       ${tags.length ? `<div class="tags">${tags.map((tag) => `<span class="tag">${escapeHtml(tag)}</span>`).join("")}</div>` : ""}
       <button class="link-btn" type="button" data-prompt="${escapeHtml(prompt)}" data-label="${escapeHtml(title)}">Ver detalhes</button>
     </article>`;
+  }
+
+  function renderCourseDetail(section) {
+    const items = safeArray(section.items);
+    if (!items.length) return "";
+    return `<section class="section panel">${sectionHeader(section)}<div class="detail-grid">${items.map((item) => `<div class="detail-item"><small>${escapeHtml(item.title || item.label || "Informação")}</small><strong>${escapeHtml(item.value || item.shortDescription || item.description || "")}</strong></div>`).join("")}</div></section>`;
   }
 
   function renderCourseCards(section) {
@@ -350,7 +361,7 @@
   function renderEvents(section) {
     const items = safeArray(section.items);
     if (!items.length) return "";
-    return `<section class="section panel">${sectionHeader(section)}${items.map((event) => `<div class="event-row"><div class="date-box">${escapeHtml(event.displayDate || event.date || "Data")}<span>${escapeHtml(event.displayTime || "")}</span></div><div><b>${escapeHtml(event.name || event.title || "Evento")}</b><span>${escapeHtml([event.city, event.state].filter(Boolean).join(" / "))}</span><p>${escapeHtml(event.description || "")}</p></div><button class="link-btn" type="button" data-prompt="${escapeHtml(`quero participar do evento ${event.name || event.title || "da graduação"}`)}" data-label="${escapeHtml(event.name || event.title || "Evento")}">Tenho interesse</button></div>`).join("")}</section>`;
+    return `<section class="section panel">${sectionHeader(section)}${items.map((event) => `<div class="event-row"><div class="date-box">${escapeHtml(event.displayDate || event.date || "Data")}<span>${escapeHtml(event.displayTime || "")}</span></div><div><b>${escapeHtml(event.name || event.title || "Evento")}</b>${event.city ? `<span>${escapeHtml([event.city, event.state].filter(Boolean).join(" / "))}</span>` : ""}<p>${escapeHtml(event.description || "")}</p></div><button class="link-btn" type="button" data-prompt="${escapeHtml(`quero participar do evento ${event.name || event.title || "da graduação"}`)}" data-label="${escapeHtml(event.name || event.title || "Evento")}">Tenho interesse</button></div>`).join("")}</section>`;
   }
 
   function renderInfoCards(section) {

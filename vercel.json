@@ -1,7 +1,4 @@
 {
-  "functions": {
-    "api/generate-ui.js": {
-      "maxDuration": 20
-    }
-  }
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "cleanUrls": true
 }

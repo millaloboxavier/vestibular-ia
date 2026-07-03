@@ -38,6 +38,15 @@ function labelStatus(status = "") {
   return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
+function cleanDisplayValue(text = "") {
+  return String(text || "")
+    .replace(/\s*\/\s*processo\s*/gi, " / processo ")
+    .replace(/\s*indicado\s+na\s+página(\s+de\s+processo\s+seletivo)?/gi, "")
+    .replace(/Consultar\s+página\s+do\s+curso/gi, "")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+}
+
 function cleanCopy(text = "") {
   let value = String(text || "");
   const replacements = [
@@ -95,10 +104,10 @@ function catalog() {
     state: course.state || "",
     school: course.school || "",
     schoolId: course.schoolId || "",
-    entry: course.entry || "",
-    duration: course.duration || "",
-    period: course.period || "",
-    tuition: course.tuition || "",
+    entry: cleanDisplayValue(course.entry || ""),
+    duration: cleanDisplayValue(course.duration || ""),
+    period: cleanDisplayValue(course.period || ""),
+    tuition: cleanDisplayValue(course.tuition || ""),
     campus: course.campus || "",
     admissions: safeArray(course.admissions),
     candidatePerSeat: course.candidatePerSeat || "",
@@ -190,7 +199,8 @@ function querySignals(message) {
   const q = normalize(message);
   return {
     q,
-    asksCourse: /(curso|graduacao|graduação|administracao|administração|direito|economia|dados|inteligencia|inteligência|comunicacao|comunicação|relacoes|relações|matematica|matemática|sociais)/.test(q),
+    asksCourse: /(curso|cursos|graduacao|graduação|administracao|administração|direito|economia|dados|inteligencia|inteligência|comunicacao|comunicação|relacoes|relações|matematica|matemática|sociais)/.test(q),
+    asksAllCourses: /(todos os cursos|quais cursos|cursos de graduacao|cursos de graduação|cursos disponiveis|cursos disponíveis|opcoes de curso|opções de curso|graduacao fgv|graduação fgv)/.test(q),
     asksDate: /(data|prazo|quando|inscric|inscrição|inscrever|termina|abre|abertura|calendario|calendário)/.test(q),
     asksVestibularSpecific: /(vestibular fgv|data.*vestibular|vestibular.*data|prova.*vestibular|vestibular.*prova|inscri.*vestibular|vestibular.*inscri|fazer o vestibular|quero fazer vestibular|vestibular$)/.test(q) && !/(enem|internacional|transfer|demanda social|olimpiad|modalidades|formas de ingresso|todas as formas)/.test(q),
     asksAdmission: /(vestibular|enem|ingresso|modalidade|transferencia|transferência|internacional|demanda social|olimpiada|olimpíada)/.test(q),
@@ -231,9 +241,16 @@ function matchAdmissionTypes(message, ids = []) {
 
 function matchCoursesFromText(message, selectedIds = [], selectedCities = []) {
   const q = normalize(message);
+  const sig = querySignals(message);
   const cities = cityHits(message, selectedCities);
   const direct = findByIds(data.courses, selectedIds);
   if (direct.length) return direct;
+
+  // Perguntas como "cursos de graduação" devem devolver o catálogo completo,
+  // não uma amostra limitada. A organização por cidade fica para o front-end.
+  if (sig.asksAllCourses && !cities.length && !sig.asksCompare) {
+    return representativeCourses();
+  }
 
   let matches = safeArray(data.courses).filter((course) => {
     const name = normalize(`${course.displayName || course.name || ""} ${course.name || ""}`);
@@ -242,22 +259,23 @@ function matchCoursesFromText(message, selectedIds = [], selectedCities = []) {
     const tags = safeArray(course.tags).map(normalize).join(" ");
     const haystack = `${name} ${school} ${city} ${tags}`;
     const cityHit = cities.length ? cities.includes(city) : false;
-    const nameHit = name.split(" ").some((part) => part.length > 4 && q.includes(part));
+    if (cities.length && !cityHit) return false;
+
+    const words = name.split(" ").filter((part) => part.length > 4);
+    const nameHit = words.some((part) => q.includes(part));
     const tagHit = safeArray(course.tags).some((tag) => normalize(tag).length > 3 && q.includes(normalize(tag)));
     const specific = ["direito", "economia", "administracao", "administração", "dados", "inteligencia", "inteligência", "comunicacao", "comunicação", "matematica", "matemática", "sociais", "relacoes", "relações"].some((term) => normalize(term).length && q.includes(normalize(term)) && haystack.includes(normalize(term)));
-    if (cities.length && !cityHit && !specific && !nameHit && !tagHit) return false;
     return cityHit || nameHit || tagHit || specific;
   });
 
-  const sig = querySignals(message);
   if (!matches.length && cities.length) {
     matches = safeArray(data.courses).filter((course) => cities.includes(normalize(course.city)));
   }
   if (!matches.length && sig.asksCourse) {
-    matches = safeArray(data.courses).slice(0, 6);
+    matches = representativeCourses();
   }
 
-  return matches.slice(0, 8);
+  return sig.asksAllCourses ? matches : matches.slice(0, 12);
 }
 
 function activeEventsByCities(cities = []) {
@@ -418,6 +436,24 @@ function courseDifferentials(courses = []) {
   return items.slice(0, 8);
 }
 
+
+function courseDetailItems(courses = []) {
+  const course = safeArray(courses)[0];
+  if (!course) return [];
+  const fields = [
+    ["Duração", cleanDisplayValue(course.duration)],
+    ["Período", cleanDisplayValue(course.period)],
+    ["Mensalidade", cleanDisplayValue(course.tuition)],
+    ["Campus", cleanDisplayValue(course.campus)],
+    ["Entrada", cleanDisplayValue(course.entry)],
+    ["Relação candidato/vaga", course.candidatePerSeat ? `${String(course.candidatePerSeat).replace(/\.$/, "")} candidato/vaga` : ""],
+    ["Formas de ingresso", safeArray(course.admissions).join(", ")]
+  ];
+  return fields
+    .filter(([, value]) => value && !/consultar/i.test(String(value)))
+    .map(([title, value], index) => ({ id: `course-detail-${index}`, title, value, shortDescription: value, type: "" }));
+}
+
 function schoolRecognitions(courses = []) {
   const courseList = safeArray(courses);
   if (courseList.length !== 1) return [];
@@ -513,7 +549,7 @@ function resolveSections(plan, message) {
   const resolved = [];
   const addSection = (section) => {
     if (!section) return;
-    if (["course_cards", "timeline", "admission_options", "events", "scholarships", "course_differentials", "school_recognitions", "course_compare", "prep_materials", "admission_details", "warning", "lead_form"].includes(section.type)) {
+    if (["course_cards", "course_detail", "timeline", "admission_options", "events", "scholarships", "course_differentials", "school_recognitions", "course_compare", "prep_materials", "admission_details", "warning", "lead_form"].includes(section.type)) {
       const already = resolved.some((item) => item.type === section.type);
       if (already && !["course_cards"].includes(section.type)) return;
     }
@@ -595,10 +631,24 @@ function resolveSections(plan, message) {
 
   requestedSections.forEach((section) => {
     if (section.type === "course_cards") {
-      const courses = matchCoursesFromText(message, section.courseIds, cityHints);
+      let courses = matchCoursesFromText(message, section.courseIds, cityHints);
+      if (sig.asksAllCourses && !cityHints.length) courses = representativeCourses();
       if (courses.length) {
         selectedCourses = selectedCourses.length ? selectedCourses : courses;
-        addSection({ ...sectionBase(section, "course_cards", "Cursos relacionados", "Veja os cursos que mais se aproximam do que você buscou.", courses.length > 1 ? "tabs_by_city" : "cards"), items: courses });
+        if (isSpecificCourseContext(message, courses, cityHints)) {
+          const details = courseDetailItems(courses);
+          if (details.length) addSection({ type: "course_detail", title: `Detalhes de ${courseName(courses[0])} — ${courses[0].city}`, intro: "Informações principais do curso organizadas para você decidir com mais clareza.", layout: "cards", items: details, course: courses[0], actions: [] });
+        } else {
+          addSection({ ...sectionBase(section, "course_cards", sig.asksAllCourses ? "Cursos de graduação por cidade" : "Cursos relacionados", sig.asksAllCourses ? "Explore todos os cursos disponíveis em cada cidade." : "Veja os cursos que mais se aproximam do que você procura.", courses.length > 1 ? "tabs_by_city" : "cards"), items: courses });
+        }
+      }
+    }
+
+    if (section.type === "course_detail") {
+      const courses = matchCoursesFromText(message, section.courseIds, cityHints);
+      if (isSpecificCourseContext(message, courses, cityHints)) {
+        const details = courseDetailItems(courses);
+        if (details.length) addSection({ ...sectionBase(section, "course_detail", `Detalhes de ${courseName(courses[0])} — ${courses[0].city}`, "Informações principais do curso organizadas para você decidir com mais clareza."), items: details, course: courses[0] });
       }
     }
 
@@ -660,8 +710,14 @@ function resolveSections(plan, message) {
     }
   });
 
-  if (sig.asksCourse && selectedCourses.length && !resolved.some((section) => section.type === "course_cards") && !sig.asksDate) {
-    addSection({ type: "course_cards", title: selectedCourses.length === safeArray(data.courses).length ? "Cursos por cidade" : "Cursos relacionados", intro: selectedCourses.length === safeArray(data.courses).length ? "Explore os cursos disponíveis em cada cidade." : "Separei as opções mais próximas do que você procura.", layout: selectedCourses.length > 1 ? "tabs_by_city" : "cards", items: selectedCourses, actions: [] });
+  if (sig.asksCourse && selectedCourses.length && !resolved.some((section) => section.type === "course_cards" || section.type === "course_detail") && !sig.asksDate) {
+    if (specificCourseContext()) {
+      const details = courseDetailItems(selectedCourses);
+      if (details.length) addSection({ type: "course_detail", title: `Detalhes de ${courseName(selectedCourses[0])} — ${selectedCourses[0].city}`, intro: "Informações principais do curso organizadas para você decidir com mais clareza.", layout: "cards", items: details, course: selectedCourses[0], actions: [] });
+    } else {
+      const coursesToShow = sig.asksAllCourses && !cityHints.length ? representativeCourses() : selectedCourses;
+      addSection({ type: "course_cards", title: sig.asksAllCourses ? "Cursos de graduação por cidade" : "Cursos relacionados", intro: sig.asksAllCourses ? "Explore todos os cursos disponíveis em cada cidade." : "Separei as opções mais próximas do que você procura.", layout: coursesToShow.length > 1 ? "tabs_by_city" : "cards", items: coursesToShow, actions: [] });
+    }
   }
 
   if ((sig.asksAdmission || sig.asksDate) && !resolved.some((section) => section.type === "admission_options") && !selectedCourses.length) {
@@ -674,7 +730,7 @@ function resolveSections(plan, message) {
   }
 
   if (broadCourseContext() && !resolved.some((section) => section.type === "admission_options")) {
-    addSection({ type: "admission_options", title: "Como você pode entrar", intro: "Depois de escolher um curso, vale entender quais modalidades de ingresso combinam com seu momento.", layout: "cards", items: admissionItems("formas de ingresso", [], selectedAdmissions.map((item) => item.id)).slice(0, 4), actions: [] });
+    addSection({ type: "admission_options", title: "Como você pode entrar", intro: "Depois de escolher um curso, vale entender quais modalidades de ingresso combinam com seu momento.", layout: "cards", items: admissionItems("formas de ingresso", [], selectedAdmissions.map((item) => item.id)), actions: [] });
   }
 
   if (specificCourseContext() && (sig.asksDifferentials || !broadCourseContext()) && selectedCourses.length && !resolved.some((section) => section.type === "course_differentials")) {
@@ -776,7 +832,10 @@ function rewriteForKnownData(plan, message, sections) {
 
   if (sig.asksCourse && !sig.asksDate && !sig.asksCompare) {
     const courses = matchCoursesFromText(message, plan.entities?.courseIds || plan.entities?.courses || [], plan.entities?.cities);
-    if (courses.length === 1) {
+    if (sig.asksAllCourses && courses.length > 1) {
+      normalized.pageTitle = "Cursos de graduação FGV";
+      normalized.answer = "Organizei os cursos por cidade para facilitar sua escolha. Você pode explorar as opções, comparar caminhos e depois entender as formas de ingresso.";
+    } else if (courses.length === 1) {
       normalized.pageTitle = courseName(courses[0]);
       normalized.answer = cleanCopy(plan.answer || `Encontrei o curso de ${courseName(courses[0])} em ${courses[0].city}. Abaixo, você vê as informações principais e alguns caminhos para continuar.`);
     }
@@ -850,7 +909,7 @@ const RESPONSE_SCHEMA = {
         additionalProperties: false,
         required: ["type", "title", "intro", "layout", "courseIds", "admissionTypeIds", "materialIds", "eventIds", "scholarshipIds", "textItems"],
         properties: {
-          type: { type: "string", enum: ["course_cards", "course_compare", "admission_options", "events", "scholarships", "course_differentials", "school_recognitions", "timeline", "prep_materials", "admission_details", "next_step", "lead_form", "warning"] },
+          type: { type: "string", enum: ["course_cards", "course_detail", "course_compare", "admission_options", "events", "scholarships", "course_differentials", "school_recognitions", "timeline", "prep_materials", "admission_details", "next_step", "lead_form", "warning"] },
           title: { type: "string" },
           intro: { type: "string" },
           layout: { type: "string", enum: ["cards", "tabs_by_city", "list", "table", "single", "form", "chips"] },
@@ -892,13 +951,13 @@ Regras obrigatórias:
 
 Matriz de navegação por intenção:
 1. Se a pessoa pergunta genericamente por cursos, cursos por cidade ou por uma área ampla:
-   - Use course_cards como primeiro bloco.
+   - Use course_cards como primeiro bloco e inclua todos os cursos relacionados; para consulta geral de cursos, não limite a amostra.
    - Se não houver cidade, organize por cidade.
    - Não use course_differentials nem school_recognitions.
    - Não use events, exceto se a pessoa pedir eventos ou mencionar uma cidade.
    - Ofereça continuidade para comparar cursos, entender formas de ingresso, ver bolsas ou conhecer eventos.
 2. Se a pessoa pergunta por um curso específico com cidade clara, por exemplo "Administração de Empresas em São Paulo":
-   - Use course_cards ou course_compare se fizer sentido.
+   - Use course_detail como primeiro bloco, não um card repetido.
    - Pode usar course_differentials apenas se houver exatamente um curso identificado e esse curso tiver diferenciais no JSON.
    - Pode usar school_recognitions apenas se houver exatamente um curso identificado.
    - Pode usar events da cidade desse curso.
@@ -958,7 +1017,7 @@ ${JSON.stringify(dataCatalog)}`;
 
     return res.status(200).json({
       ...normalized,
-      debug: { mode: "openai", model, renderer: "sections_v2", noFallback: true }
+      debug: { mode: "openai", model, renderer: "sections_v3", noFallback: true }
     });
   } catch (error) {
     return res.status(502).json({ error: "Não foi possível gerar a resposta com a OpenAI.", mode: "openai_exception", details: error.message });
