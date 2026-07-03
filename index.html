@@ -7,176 +7,211 @@
 <style>
   :root{
     --bg:#f7f7f4;
-    --panel:#fff;
-    --ink:#151515;
-    --muted:#62625d;
-    --line:#deded8;
+    --panel:#ffffff;
     --soft:#f1f1ee;
-    --accent:#151515;
-    --warn:#8b5a00;
-    --warn-bg:#fff8e7;
+    --line:#d9d9d2;
+    --line-strong:#bfbfb6;
+    --ink:#151514;
+    --muted:#66665f;
+    --accent:#151514;
+    --green:#15996f;
+    --blue-bg:#f1f2ff;
+    --blue-line:#cfd2f6;
   }
   *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink)}
   a{color:inherit;text-decoration:none}
-  header{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--line)}
-  .header-inner{max-width:1180px;margin:0 auto;padding:18px 22px;display:flex;align-items:center;gap:24px;justify-content:space-between}
-  .brand{display:flex;align-items:center;gap:12px;font-size:22px;font-weight:800;white-space:nowrap}
-  .mark{width:34px;height:34px;border-radius:50%;background:#151515;display:inline-block}
-  nav{display:flex;gap:20px;color:var(--muted);font-size:16px;white-space:nowrap;overflow:hidden}
-  nav a:hover{color:#111}
-  .hero{max-width:1180px;margin:0 auto;padding:70px 22px 48px;display:grid;grid-template-columns:1.05fr .95fr;gap:28px;align-items:start}
-  .hero-card,.side-card,.component,.result-head{background:var(--panel);border:1px solid var(--line);border-radius:28px;box-shadow:0 1px 0 rgba(0,0,0,.02)}
-  .hero-card{padding:40px}
-  h1{font-size:50px;line-height:1.02;margin:0 0 16px;letter-spacing:-.05em}
-  .lead{font-size:21px;line-height:1.45;color:var(--muted);margin:0 0 28px}
-  .search-wrap{position:relative}
-  .search-input{width:100%;border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:20px 132px 20px 24px;font-size:18px;outline:none;box-shadow:inset 0 0 0 1px transparent}
-  .search-input:focus{border-color:#111;box-shadow:0 0 0 4px rgba(0,0,0,.04)}
-  .search-btn{position:absolute;right:8px;top:8px;border:0;background:#111;color:#fff;border-radius:999px;padding:13px 28px;font-size:17px;font-weight:800;cursor:pointer}
-  .search-btn:disabled{opacity:.55;cursor:default}
-  .suggestions{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
-  .chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:10px 14px;font-size:14px;color:#333;cursor:pointer}
-  .chip:hover{border-color:#111}
-  .side-card{padding:28px}
-  .side-card h2{font-size:24px;margin:0 0 14px}
-  .path-list{display:grid;gap:12px;margin-top:18px}
-  .path{padding:16px;border:1px solid var(--line);border-radius:18px;background:var(--soft)}
-  .path b{display:block;margin-bottom:4px}
-  .path span{color:var(--muted);font-size:14px;line-height:1.35}
-  .top-search{display:none;position:sticky;top:71px;z-index:15;background:rgba(247,247,244,.96);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding:14px 22px}
+  button,input{font:inherit}
+  header{height:72px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;position:sticky;top:0;z-index:30}
+  .header-inner{max-width:1180px;margin:0 auto;width:100%;padding:0 22px;display:flex;align-items:center;justify-content:space-between;gap:18px}
+  .brand{display:flex;align-items:center;gap:13px;font-weight:850;font-size:25px;letter-spacing:-.04em;background:transparent;border:0;cursor:pointer}
+  .mark{width:36px;height:36px;border-radius:50%;background:radial-gradient(circle at 30% 25%,#30302d,#10100f)}
+  nav{display:flex;gap:8px;align-items:center}
+  nav button{background:transparent;border:0;padding:10px 12px;color:#555;font-size:15px;cursor:pointer;border-radius:999px}
+  nav button:hover{background:var(--soft);color:var(--ink)}
+  .ghost-btn,.black-btn{border-radius:999px;padding:12px 18px;font-weight:800;cursor:pointer}
+  .ghost-btn{border:1.5px solid var(--line-strong);background:#fff;color:#555}
+  .black-btn{border:0;background:#111;color:#fff}
+
+  .hero{min-height:calc(100vh - 72px);max-width:1120px;margin:0 auto;padding:58px 22px 44px;display:flex;flex-direction:column;align-items:center;text-align:center}
+  .top-badge{display:inline-flex;align-items:center;gap:10px;border:1.5px solid var(--line-strong);background:#fff;border-radius:999px;padding:10px 18px;font-size:16px;font-weight:800;margin-bottom:42px}
+  .dot{width:9px;height:9px;border-radius:50%;background:var(--green)}
+  .hero-mark{width:84px;height:84px;border-radius:50%;background:radial-gradient(circle at 30% 25%,#3b3b37,#10100f);margin-bottom:38px}
+  h1{font-size:52px;line-height:1.02;letter-spacing:-.06em;margin:0 0 16px}
+  .lead{font-size:24px;color:var(--muted);margin:0 0 34px;line-height:1.35;max-width:760px}
+  .search-wrap{width:100%;max-width:940px;position:relative}
+  .search-input{width:100%;border:2px solid var(--line-strong);background:#fff;border-radius:999px;padding:23px 88px 23px 28px;font-size:21px;outline:none;box-shadow:0 1px 0 rgba(0,0,0,.02)}
+  .search-input:focus{border-color:#111;box-shadow:0 0 0 4px rgba(0,0,0,.05)}
+  .send-btn{position:absolute;right:10px;top:10px;width:58px;height:58px;border:0;border-radius:50%;background:#111;color:#fff;font-size:27px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+  .send-btn:disabled{opacity:.55;cursor:default}
+  .suggestions{display:flex;flex-wrap:wrap;justify-content:center;gap:14px;margin:28px 0 0;max-width:820px}
+  .chip{border:1.5px solid var(--line-strong);background:#fff;border-radius:999px;padding:14px 22px;font-size:17px;color:#222;cursor:pointer}
+  .chip:hover{border-color:#111;background:var(--soft)}
+  .event-banner{margin-top:48px;width:100%;border:1.5px solid var(--line-strong);border-radius:20px;background:#fff;padding:24px 30px;display:flex;align-items:center;justify-content:space-between;text-align:left;gap:20px;cursor:pointer}
+  .event-banner small{display:block;color:var(--muted);font-size:13px;font-weight:850;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+  .event-banner strong{display:block;font-size:26px;letter-spacing:-.04em}
+  .event-banner span{display:block;color:var(--muted);font-size:18px;margin-top:4px}
+  .event-banner b{font-size:18px;white-space:nowrap}
+
+  .top-search{display:none;position:sticky;top:72px;z-index:25;background:rgba(247,247,244,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:15px 22px}
   .top-search.show{display:block}
   .top-search .search-wrap{max-width:820px;margin:0 auto}
-  .top-search .search-input{padding:15px 118px 15px 22px;font-size:16px}
-  .top-search .search-btn{top:6px;right:7px;padding:10px 24px;font-size:15px}
-  .results{max-width:1180px;margin:0 auto;padding:34px 22px 70px;display:none}
+  .top-search .search-input{padding:15px 76px 15px 22px;font-size:16px;border-width:1.5px}
+  .top-search .send-btn{width:44px;height:44px;right:7px;top:6px;font-size:20px}
+
+  .results{max-width:1180px;margin:0 auto;padding:36px 22px 80px;display:none}
   .results.show{display:block}
-  .result-head{padding:30px 34px;margin-bottom:22px}
-  .result-head h2{font-size:36px;line-height:1.08;margin:0 0 12px;letter-spacing:-.04em}
-  .result-head p{font-size:20px;color:var(--muted);line-height:1.45;margin:0}
-  .query-line{margin-top:16px;color:var(--muted);font-size:15px}
-  .primary-cta{display:inline-flex;margin-top:18px;background:#111;color:#fff;border-radius:999px;padding:13px 20px;font-weight:800}
-  .component{padding:28px 32px;margin-bottom:22px}
-  .component h3{font-size:29px;letter-spacing:-.04em;margin:0 0 10px}
-  .component p.section-intro{font-size:18px;color:var(--muted);line-height:1.45;margin:0 0 22px}
+  .panel{background:#fff;border:1px solid var(--line);border-radius:28px;box-shadow:0 12px 34px rgba(0,0,0,.03)}
+  .context-card{padding:28px 32px;margin-bottom:22px;background:var(--blue-bg);border-color:var(--blue-line)}
+  .context-card .query{font-size:16px;color:#3e3e72;margin:0 0 18px}
+  .context-card .query strong{color:#222}
+  .context-card h2{font-size:42px;letter-spacing:-.055em;line-height:1.05;margin:0 0 12px}
+  .context-card p{font-size:21px;line-height:1.42;color:#555;margin:0;max-width:920px}
+  .section{padding:30px 32px;margin-bottom:22px}
+  .section.compact{padding:24px 28px}
+  .section h3{font-size:31px;letter-spacing:-.05em;margin:0 0 10px;line-height:1.1}
+  .section-intro{font-size:18px;color:var(--muted);line-height:1.45;margin:0 0 22px;max-width:930px}
   .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
-  .card,.list-item{border:1px solid var(--line);border-radius:22px;background:var(--soft);padding:22px}
-  .card h4{font-size:22px;line-height:1.15;margin:0 0 7px}
-  .meta{color:var(--muted);font-size:15px;margin-bottom:14px}
-  .card p{color:var(--muted);font-size:16px;line-height:1.45;margin:0 0 16px}
+  .card{border:1px solid var(--line);background:var(--soft);border-radius:22px;padding:22px;min-width:0}
+  .card h4{font-size:23px;letter-spacing:-.04em;line-height:1.15;margin:0 0 6px}
+  .meta{color:var(--muted);font-size:15px;line-height:1.35;margin-bottom:13px}
+  .card p{color:var(--muted);font-size:16px;line-height:1.45;margin:0 0 14px}
   .tags{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
-  .tag{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 10px;color:#555;font-size:13px}
-  .link-btn{display:inline-flex;align-items:center;gap:6px;border:1.5px solid #111;border-radius:999px;padding:9px 16px;background:#fff;font-weight:800;cursor:pointer}
+  .tag{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 10px;color:#555;font-size:13px;line-height:1}
+  .link-btn{display:inline-flex;align-items:center;justify-content:center;border:1.5px solid #111;border-radius:999px;padding:10px 16px;background:#fff;font-weight:800;cursor:pointer;margin-top:6px}
+  .link-btn:hover{background:#111;color:#fff}
+  .timeline{display:grid;gap:12px}
+  .timeline-item{display:grid;grid-template-columns:210px 1fr;gap:18px;align-items:start;border:1px solid var(--line);background:var(--soft);border-radius:20px;padding:18px 20px}
+  .timeline-date{background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px 14px;font-weight:850;text-align:center}
+  .timeline-body b{font-size:18px;display:block;margin-bottom:4px}
+  .timeline-body span{color:var(--muted);line-height:1.4}
   .list{display:grid;gap:12px}
-  .list-item{display:flex;justify-content:space-between;gap:18px;align-items:center}
-  .list-item b{display:block;font-size:18px;margin-bottom:4px}
+  .list-item{border:1px solid var(--line);background:var(--soft);border-radius:20px;padding:18px 20px;display:flex;justify-content:space-between;gap:16px;align-items:center}
+  .list-item b{display:block;font-size:19px;margin-bottom:4px}
   .list-item span{display:block;color:var(--muted);line-height:1.4}
-  .table-wrap{overflow:auto;border:1px solid var(--line);border-radius:18px;background:#fff}
-  table{width:100%;border-collapse:collapse;min-width:720px}
-  th,td{border-bottom:1px solid var(--line);padding:14px 16px;text-align:left;vertical-align:top}
-  th{background:var(--soft);font-weight:800}
-  tr:last-child th,tr:last-child td{border-bottom:0}
   .event-row{display:grid;grid-template-columns:110px 1fr auto;gap:18px;align-items:center;border:1px solid var(--line);background:var(--soft);border-radius:22px;padding:18px;margin-bottom:12px}
-  .date-box{background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px;text-align:center;font-weight:800}
+  .date-box{background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px;text-align:center;font-weight:850}
   .date-box span{display:block;color:var(--muted);font-weight:600;font-size:13px;margin-top:4px}
-  .notice{border:1px solid #f0d58a;background:var(--warn-bg);color:var(--warn);border-radius:18px;padding:16px 18px;margin-bottom:22px;font-weight:650;display:none}
-  .notice.show{display:block}
-  .lead-form{display:grid;grid-template-columns:1fr 1fr auto;gap:10px;margin-top:10px}
-  .lead-form input{border:1px solid var(--line);border-radius:999px;padding:13px 15px;font-size:15px}
-  .lead-form button{border:0;background:#111;color:#fff;border-radius:999px;padding:13px 18px;font-weight:800;cursor:pointer}
-  .saved{color:#0f6b43;font-weight:700;margin-top:10px;display:none}
+  .table-wrap{overflow:auto;border:1px solid var(--line);border-radius:18px;background:#fff}
+  table{width:100%;border-collapse:collapse;min-width:760px}
+  th,td{border-bottom:1px solid var(--line);padding:14px 16px;text-align:left;vertical-align:top}
+  th{background:var(--soft);font-weight:850}
+  tr:last-child th,tr:last-child td{border-bottom:0}
+  .continue{background:#fff;border:1px solid var(--line);border-radius:24px;padding:22px 26px;margin-bottom:22px}
+  .continue h3{font-size:24px;margin:0 0 5px;letter-spacing:-.04em}
+  .continue p{margin:0 0 16px;color:var(--muted);font-size:16px}
+  .actions{display:flex;flex-wrap:wrap;gap:10px}
+  .action-chip{border:1.5px solid #111;border-radius:999px;background:#fff;padding:11px 16px;font-weight:800;cursor:pointer}
+  .action-chip.primary{background:#111;color:#fff}
+  .lead-form{display:grid;grid-template-columns:1fr 1fr auto;gap:10px;margin-top:12px}
+  .lead-form input{border:1px solid var(--line);border-radius:999px;padding:14px 16px;font-size:15px;background:#fff}
+  .lead-form button{border:0;background:#111;color:#fff;border-radius:999px;padding:14px 20px;font-weight:850;cursor:pointer}
+  .saved{display:none;color:#0d744b;font-weight:800;margin-top:12px}
   .saved.show{display:block}
-  .followups{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
-  .empty{color:var(--muted);padding:18px;border:1px dashed var(--line);border-radius:16px}
+  .notice{border:1px solid #e0a5a5;background:#fff2f2;color:#8a2020;border-radius:18px;padding:16px 18px;margin-bottom:22px;font-weight:650;display:none}
+  .notice.show{display:block}
+  .debug{font-size:11px;color:#999;margin-top:16px;display:none}
   @media(max-width:850px){
-    .hero{grid-template-columns:1fr;padding-top:34px}.hero-card{padding:28px}h1{font-size:38px}.lead{font-size:18px}nav{display:none}.grid{grid-template-columns:1fr}.event-row{grid-template-columns:1fr}.lead-form{grid-template-columns:1fr}.result-head h2{font-size:30px}.component{padding:24px}.component h3{font-size:25px}
+    header{height:64px}.brand{font-size:21px}.mark{width:30px;height:30px}nav{display:none}.hero{padding-top:34px}.top-badge{margin-bottom:28px}.hero-mark{width:66px;height:66px;margin-bottom:28px}h1{font-size:39px}.lead{font-size:19px}.search-input{font-size:17px;padding:19px 75px 19px 22px}.send-btn{width:50px;height:50px;top:7px}.event-banner{align-items:flex-start;flex-direction:column}.grid{grid-template-columns:1fr}.timeline-item,.event-row{grid-template-columns:1fr}.lead-form{grid-template-columns:1fr}.context-card h2{font-size:32px}.context-card p{font-size:18px}.section{padding:24px}.section h3{font-size:26px}
   }
 </style>
 </head>
 <body>
 <header>
   <div class="header-inner">
-    <a class="brand" href="/" aria-label="Vestibular FGV"><span class="mark"></span>Vestibular FGV</a>
+    <button class="brand" type="button" data-home><span class="mark"></span>Vestibular FGV</button>
     <nav>
-      <a href="https://vestibular.fgv.br/cursos" target="_blank" rel="noopener">Cursos</a>
-      <a href="https://vestibular.fgv.br/processo-seletivo" target="_blank" rel="noopener">Processo seletivo</a>
-      <a href="https://vestibular.fgv.br/graduacao/formas-de-ingresso" target="_blank" rel="noopener">Formas de ingresso</a>
+      <button type="button" data-prompt="quais cursos a FGV oferece?">Cursos</button>
+      <button type="button" data-prompt="quais são as datas de inscrição no vestibular?">Processo seletivo</button>
+      <button type="button" data-prompt="quais formas de ingresso posso usar?">Formas de ingresso</button>
+      <button type="button" data-prompt="quais bolsas de estudo a FGV oferece?">Bolsas</button>
     </nav>
   </div>
 </header>
 
 <div class="top-search" id="topSearch">
   <div class="search-wrap">
-    <input id="topQuery" class="search-input" placeholder="Pergunte sobre cursos, formas de ingresso, bolsas, eventos ou provas..." />
-    <button id="topBtn" class="search-btn">Buscar</button>
+    <input id="topQuery" class="search-input" placeholder="Pergunte sobre cursos, datas, formas de ingresso, bolsas, eventos ou provas..." />
+    <button id="topBtn" class="send-btn" aria-label="Buscar">↑</button>
   </div>
 </div>
 
 <main>
   <section class="hero" id="hero">
-    <div class="hero-card">
-      <h1>Encontre seu caminho no Vestibular FGV.</h1>
-      <p class="lead">Digite o que você quer saber. Você pode perguntar por curso, cidade, forma de ingresso, bolsa, evento, prova anterior ou inscrição.</p>
-      <div class="search-wrap">
-        <input id="query" class="search-input" placeholder="ex: quero conhecer Administração em São Paulo" autofocus />
-        <button id="mainBtn" class="search-btn">Buscar</button>
-      </div>
-      <div class="suggestions" id="suggestions"></div>
+    <button class="top-badge" type="button" data-prompt="quais são as datas de inscrição no processo seletivo 2027.1?"><span class="dot"></span>Processo seletivo 2027.1 — inscrições a partir de 27/07</button>
+    <div class="hero-mark"></div>
+    <h1>Oi! Vamos encontrar o que você precisa?</h1>
+    <p class="lead">Escreva do seu jeito ou escolha uma das opções abaixo.</p>
+    <div class="search-wrap">
+      <input id="query" class="search-input" placeholder="ex: quero saber quando termina a inscrição do curso de Direito" autofocus />
+      <button id="mainBtn" class="send-btn" aria-label="Buscar">↑</button>
     </div>
-    <aside class="side-card">
-      <h2>O que você pode buscar</h2>
-      <div class="path-list">
-        <div class="path"><b>Conhecer cursos</b><span>Veja opções por cidade, escola responsável e links oficiais.</span></div>
-        <div class="path"><b>Comparar caminhos</b><span>Compare cursos, formas de ingresso e próximos passos.</span></div>
-        <div class="path"><b>Preparar-se</b><span>Encontre provas anteriores, gabaritos, editais e datas importantes.</span></div>
-        <div class="path"><b>Conhecer a FGV de perto</b><span>Quando houver eventos ativos, veja opções na cidade do curso.</span></div>
+    <div class="suggestions" id="suggestions"></div>
+    <button class="event-banner" type="button" data-prompt="quais eventos da graduação estão disponíveis?">
+      <div>
+        <small>Evento em destaque</small>
+        <strong>Semana Imersiva FGV 2026</strong>
+        <span>Viva a experiência universitária na prática — Rio, São Paulo e Brasília</span>
       </div>
-    </aside>
+      <b>Saiba mais →</b>
+    </button>
   </section>
 
   <section class="results" id="results">
     <div class="notice" id="notice"></div>
-    <div class="result-head" id="resultHead"></div>
+    <div class="context-card panel" id="resultHead"></div>
     <div id="sections"></div>
-    <div class="followups" id="followups"></div>
+    <div class="debug" id="debug"></div>
   </section>
 </main>
 
 <script>
   const API_ENDPOINT = "/api/generate-ui";
-  const suggestions = [
-    "quais cursos existem no Rio de Janeiro?",
-    "posso usar minha nota do Enem para Direito em São Paulo?",
-    "quero conhecer Administração em São Paulo",
-    "qual a diferença entre Administração e Administração Pública?",
-    "tem prova antiga para eu treinar?",
-    "quais bolsas a FGV oferece?"
+  const defaultSuggestions = [
+    "Quero me inscrever",
+    "Quero conhecer os cursos",
+    "Comparar cursos",
+    "Ver provas anteriores",
+    "Quais bolsas a FGV oferece?"
   ];
 
   const $ = (selector) => document.querySelector(selector);
-  const escapeHtml = (value = "") => String(value).replace(/[&<>'"]/g, (char) => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;","\"":"&quot;"}[char]));
+  const $$ = (selector) => Array.from(document.querySelectorAll(selector));
   const safeArray = (value) => Array.isArray(value) ? value : [];
+  const escapeHtml = (value = "") => String(value).replace(/[&<>'"]/g, (char) => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;","\"":"&quot;"}[char]));
 
-  function setSuggestions(items = suggestions) {
-    $("#suggestions").innerHTML = items.map((text) => `<button class="chip" type="button">${escapeHtml(text)}</button>`).join("");
-    document.querySelectorAll(".chip").forEach((btn) => btn.addEventListener("click", () => search(btn.textContent.trim())));
+  function cleanTag(value = "") {
+    const text = String(value || "").trim();
+    if (!text) return "";
+    if (/consultar página|página do curso|site oficial/i.test(text)) return "";
+    return text;
+  }
+
+  function setSuggestions(items = defaultSuggestions) {
+    $("#suggestions").innerHTML = safeArray(items).map((text) => `<button class="chip" type="button" data-prompt="${escapeHtml(text)}">${escapeHtml(text)}</button>`).join("");
   }
 
   function setLoading(isLoading) {
     ["#mainBtn", "#topBtn"].forEach((id) => {
       const btn = $(id);
       btn.disabled = isLoading;
-      btn.textContent = isLoading ? "Buscando..." : "Buscar";
+      btn.textContent = isLoading ? "…" : "↑";
     });
   }
 
-  function showNotice(text, isError = false) {
+  function showNotice(text) {
     const box = $("#notice");
     box.textContent = text || "";
     box.classList.toggle("show", Boolean(text));
-    box.style.borderColor = isError ? "#e0a5a5" : "#f0d58a";
-    box.style.background = isError ? "#fff2f2" : "var(--warn-bg)";
-    box.style.color = isError ? "#8a2020" : "var(--warn)";
+  }
+
+  function goHome() {
+    $("#hero").style.display = "flex";
+    $("#topSearch").classList.remove("show");
+    $("#results").classList.remove("show");
+    $("#query").value = "";
+    $("#topQuery").value = "";
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   async function search(value) {
@@ -195,19 +230,16 @@
         body: JSON.stringify({ message })
       });
       const payload = await response.json();
-      if (!response.ok) {
-        throw new Error(payload.error || "A busca não respondeu agora.");
-      }
+      if (!response.ok) throw new Error(payload.error || "A busca não respondeu agora.");
       renderPlan(payload, message);
     } catch (error) {
       console.error(error);
       $("#hero").style.display = "none";
       $("#topSearch").classList.add("show");
       $("#results").classList.add("show");
-      $("#resultHead").innerHTML = `<h2>Não foi possível montar a resposta agora.</h2><p>Tente novamente em instantes. Se o erro continuar, confira a configuração da chave da OpenAI na Vercel.</p>`;
+      $("#resultHead").innerHTML = `<div class="query">Sua busca: <strong>${escapeHtml(message)}</strong></div><h2>Não foi possível montar a resposta agora.</h2><p>Tente novamente em instantes.</p>`;
       $("#sections").innerHTML = "";
-      $("#followups").innerHTML = "";
-      showNotice(error.message, true);
+      showNotice(error.message);
     } finally {
       setLoading(false);
     }
@@ -217,162 +249,169 @@
     $("#hero").style.display = "none";
     $("#topSearch").classList.add("show");
     $("#results").classList.add("show");
+
     $("#resultHead").innerHTML = `
-      <h2>${escapeHtml(plan.pageTitle || "O que encontrei para você")}</h2>
-      <p>${escapeHtml(plan.answer || "Veja as informações relacionadas à sua busca.")}</p>
-      <div class="query-line"><b>Sua busca:</b> ${escapeHtml(originalMessage)}</div>
-      ${plan.primaryCta?.url ? `<a class="primary-cta" href="${escapeHtml(plan.primaryCta.url)}" target="_blank" rel="noopener">${escapeHtml(plan.primaryCta.label || "Abrir página oficial")}</a>` : ""}
+      <div class="query">Você buscou: <strong>${escapeHtml(originalMessage)}</strong></div>
+      <h2>${escapeHtml(plan.pageTitle || "Resultado da busca")}</h2>
+      <p>${escapeHtml(plan.answer || "Separei as informações mais relevantes para você continuar.")}</p>
     `;
-    $("#sections").innerHTML = safeArray(plan.sections).map(renderSection).join("") || `<div class="component"><div class="empty">Não encontrei uma seção para esta busca. Tente reformular com o nome do curso, cidade ou forma de ingresso.</div></div>`;
-    renderFollowups(plan.followUpSuggestions || []);
-    window.scrollTo({top:0,behavior:"smooth"});
+
+    const sections = safeArray(plan.sections).map((section) => renderSection(section)).join("");
+    $("#sections").innerHTML = sections || `<section class="section panel"><h3>Não encontrei um bloco para essa busca</h3><p class="section-intro">Tente perguntar por curso, cidade, forma de ingresso, bolsas, eventos ou datas de inscrição.</p></section>`;
+    $("#debug").textContent = plan.debug ? JSON.stringify(plan.debug) : "";
+    bindDynamicActions();
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   function renderSection(section) {
-    const type = section.type;
-    if (type === "course_cards") return renderCardsSection(section, renderCourseCard);
-    if (type === "course_compare") return renderCourseCompare(section);
-    if (type === "admission_options") return renderListSection(section, renderAdmissionItem);
-    if (type === "events") return renderEvents(section);
-    if (type === "scholarships") return renderListSection(section, renderScholarshipItem);
-    if (type === "course_differentials") return renderCardsSection(section, renderDifferentialCard);
-    if (type === "timeline") return renderListSection(section, renderTimelineItem);
-    if (type === "prep_materials" || type === "official_links") return renderListSection(section, renderLinkItem);
-    if (type === "lead_form") return renderLeadForm(section);
-    if (type === "next_step") return renderNextStep(section);
-    if (type === "warning") return renderWarning(section);
+    if (!section || !section.type) return "";
+    if (section.type === "course_cards") return renderCourseCards(section);
+    if (section.type === "timeline") return renderTimeline(section);
+    if (section.type === "admission_options") return renderAdmissionOptions(section);
+    if (section.type === "events") return renderEvents(section);
+    if (section.type === "course_differentials" || section.type === "school_recognitions") return renderInfoCards(section);
+    if (section.type === "scholarships") return renderScholarships(section);
+    if (section.type === "course_compare") return renderCompare(section);
+    if (section.type === "prep_materials") return renderInfoCards(section);
+    if (section.type === "lead_form") return renderLeadForm(section);
+    if (section.type === "next_step") return renderNextStep(section);
+    if (section.type === "warning") return renderWarning(section);
     return "";
   }
 
-  function sectionShell(section, content) {
-    return `
-      <section class="component component-${escapeHtml(section.type)}">
-        <h3>${escapeHtml(section.title || "Veja também")}</h3>
-        ${section.intro ? `<p class="section-intro">${escapeHtml(section.intro)}</p>` : ""}
-        ${content}
-        ${section.cta?.url ? `<a class="link-btn" style="margin-top:18px" href="${escapeHtml(section.cta.url)}" target="_blank" rel="noopener">${escapeHtml(section.cta.label || "Abrir")}</a>` : ""}
-      </section>`;
+  function sectionHeader(section) {
+    return `<h3>${escapeHtml(section.title || "")}</h3>${section.intro ? `<p class="section-intro">${escapeHtml(section.intro)}</p>` : ""}`;
   }
 
-  function renderCardsSection(section, itemRenderer) {
+  function renderCourseCards(section) {
     const items = safeArray(section.items);
     if (!items.length) return "";
-    return sectionShell(section, `<div class="grid">${items.map(itemRenderer).join("")}</div>`);
-  }
-
-  function renderListSection(section, itemRenderer) {
-    const items = safeArray(section.items);
-    if (!items.length) return "";
-    return sectionShell(section, `<div class="list">${items.map(itemRenderer).join("")}</div>`);
-  }
-
-  function renderCourseCard(course) {
-    const pills = [course.duration, course.period, course.entry].filter(Boolean).slice(0,3);
-    return `
-      <article class="card">
+    return `<section class="section panel">${sectionHeader(section)}<div class="grid">${items.map((course) => {
+      const tags = [course.duration, course.period, course.entry, course.candidatePerSeat ? `${course.candidatePerSeat.replace(/\.$/, "")} candidato/vaga` : ""].map(cleanTag).filter(Boolean).slice(0, 4);
+      const prompt = `quero detalhes do curso de ${course.displayName || course.name || "curso"} em ${course.city || ""}`;
+      return `<article class="card">
         <h4>${escapeHtml(course.displayName || course.name || "Curso")}</h4>
-        <div class="meta">${escapeHtml([course.school, course.city && `${course.city} / ${course.state || ""}`].filter(Boolean).join(" · "))}</div>
-        <p>${escapeHtml(course.summary || "Abra a página oficial para conferir detalhes do curso.")}</p>
-        ${pills.length ? `<div class="tags">${pills.map((pill) => `<span class="tag">${escapeHtml(pill)}</span>`).join("")}</div>` : ""}
-        ${course.url ? `<a class="link-btn" href="${escapeHtml(course.url)}" target="_blank" rel="noopener">Abrir curso</a>` : ""}
+        <div class="meta">${escapeHtml([course.school, course.city && `${course.city}${course.state ? ` / ${course.state}` : ""}`].filter(Boolean).join(" · "))}</div>
+        <p>${escapeHtml(course.summary || "Veja informações sobre o curso, cidade, formas de ingresso e próximos caminhos.")}</p>
+        ${tags.length ? `<div class="tags">${tags.map((tag) => `<span class="tag">${escapeHtml(tag)}</span>`).join("")}</div>` : ""}
+        <button class="link-btn" type="button" data-prompt="${escapeHtml(prompt)}">Ver detalhes</button>
       </article>`;
+    }).join("")}</div></section>`;
   }
 
-  function renderCourseCompare(section) {
-    const courses = safeArray(section.items).slice(0,3);
-    if (courses.length < 2) return renderCardsSection({ ...section, type:"course_cards", title: section.title || "Cursos relacionados" }, renderCourseCard);
-    const rows = [
-      ["Cidade", "city"],
-      ["Escola", "school"],
-      ["Duração", "duration"],
-      ["Período", "period"],
-      ["Mensalidade", "tuition"],
-      ["Formas de ingresso", "admissions"]
-    ];
-    const table = `<div class="table-wrap"><table>
-      <tr><th>Critério</th>${courses.map((course) => `<th>${escapeHtml(course.displayName || course.name)}<br><span style="color:var(--muted);font-weight:500">${escapeHtml(course.city || "")}</span></th>`).join("")}</tr>
-      ${rows.map(([label,key]) => `<tr><th>${escapeHtml(label)}</th>${courses.map((course) => `<td>${escapeHtml(Array.isArray(course[key]) ? course[key].join(", ") : (course[key] || "Consultar página do curso"))}</td>`).join("")}</tr>`).join("")}
-    </table></div>`;
-    return sectionShell(section, table);
+  function renderTimeline(section) {
+    const items = safeArray(section.items);
+    if (!items.length) return "";
+    return `<section class="section panel">${sectionHeader(section)}<div class="timeline">${items.map((item) => `
+      <div class="timeline-item">
+        <div class="timeline-date">${escapeHtml(item.value || item.period || "Em breve")}</div>
+        <div class="timeline-body"><b>${escapeHtml(item.label || item.name || "Data")}</b>${item.description ? `<span>${escapeHtml(item.description)}</span>` : ""}</div>
+      </div>`).join("")}</div></section>`;
   }
 
-  function renderAdmissionItem(item) {
-    return `<div class="list-item"><div><b>${escapeHtml(item.label || item.name)}</b><span>${escapeHtml([item.description, item.status].filter(Boolean).join(" "))}</span></div>${item.url ? `<a class="link-btn" href="${escapeHtml(item.url)}" target="_blank" rel="noopener">Ver</a>` : ""}</div>`;
-  }
-
-  function renderScholarshipItem(item) {
-    return `<div class="list-item"><div><b>${escapeHtml(item.name || item.title)}</b><span>${escapeHtml(item.shortDescription || item.description || "Consulte as regras da bolsa na página oficial.")}</span></div>${item.cta?.url || item.url ? `<a class="link-btn" href="${escapeHtml(item.cta?.url || item.url)}" target="_blank" rel="noopener">Ver</a>` : ""}</div>`;
-  }
-
-  function renderDifferentialCard(item) {
-    return `<article class="card"><h4>${escapeHtml(item.title || "Diferencial")}</h4>${item.courseName ? `<div class="meta">${escapeHtml(item.courseName)}</div>` : ""}<p>${escapeHtml(item.shortDescription || item.description || "")}</p></article>`;
-  }
-
-  function renderTimelineItem(item) {
-    return `<div class="list-item"><div><b>${escapeHtml(item.label || item.title || "Data")}</b><span>${escapeHtml(item.value || item.date || item.description || "")}</span></div>${item.url ? `<a class="link-btn" href="${escapeHtml(item.url)}" target="_blank" rel="noopener">Ver</a>` : ""}</div>`;
-  }
-
-  function renderLinkItem(item) {
-    return `<div class="list-item"><div><b>${escapeHtml(item.label || item.title || item.name)}</b><span>${escapeHtml(item.description || "Página oficial relacionada à sua busca.")}</span></div>${item.url ? `<a class="link-btn" href="${escapeHtml(item.url)}" target="_blank" rel="noopener">Abrir</a>` : ""}</div>`;
+  function renderAdmissionOptions(section) {
+    const items = safeArray(section.items);
+    if (!items.length) return "";
+    return `<section class="section panel">${sectionHeader(section)}<div class="grid">${items.map((item) => {
+      const prompt = `quero saber mais sobre ${item.label || item.name || "essa forma de ingresso"}`;
+      return `<article class="card">
+        <h4>${escapeHtml(item.label || item.name || "Forma de ingresso")}</h4>
+        <div class="meta">${escapeHtml([item.cycle, item.status].filter(Boolean).join(" · "))}</div>
+        <p>${escapeHtml(item.description || "Modalidade de ingresso para a graduação FGV.")}</p>
+        ${item.period ? `<div class="tags"><span class="tag">${escapeHtml(item.period)}</span></div>` : ""}
+        <button class="link-btn" type="button" data-prompt="${escapeHtml(prompt)}">Entender esta opção</button>
+      </article>`;
+    }).join("")}</div></section>`;
   }
 
   function renderEvents(section) {
-    const events = safeArray(section.items);
-    if (!events.length) return "";
-    const html = events.map((event) => `
-      <div class="event-row">
-        <div class="date-box">${escapeHtml(event.displayDate || event.date || "Evento")}<span>${escapeHtml(event.displayTime || "")}</span></div>
-        <div><b>${escapeHtml(event.name || event.title)}</b><div class="meta">${escapeHtml([event.city, event.state].filter(Boolean).join(" / "))}</div><p style="margin:6px 0 0;color:var(--muted)">${escapeHtml(event.description || "Conheça a experiência da graduação FGV.")}</p></div>
-        ${event.cta?.url || event.url ? `<a class="link-btn" href="${escapeHtml(event.cta?.url || event.url)}" target="_blank" rel="noopener">${escapeHtml(event.cta?.label || "Participar")}</a>` : ""}
-      </div>`).join("");
-    return sectionShell(section, html);
+    const items = safeArray(section.items);
+    if (!items.length) return "";
+    return `<section class="section panel">${sectionHeader(section)}${items.map((event) => {
+      const month = String(event.displayDate || event.date || "").replace(/ de /g, " ");
+      return `<div class="event-row">
+        <div class="date-box">${escapeHtml(event.displayDate || event.date || "Data")}<span>${escapeHtml(event.displayTime || "")}</span></div>
+        <div><b>${escapeHtml(event.name || event.title || "Evento")}</b><span>${escapeHtml([event.city, event.state].filter(Boolean).join(" / "))}</span><p>${escapeHtml(event.description || "")}</p></div>
+        <button class="link-btn" type="button" data-prompt="${escapeHtml(`quero participar do evento ${event.name || event.title || "da graduação"}`)}">Tenho interesse</button>
+      </div>`;
+    }).join("")}</section>`;
   }
 
-  function renderNextStep(section) {
-    const cta = section.cta || {};
-    const action = cta.actionType === "ask_followup" && cta.prompt
-      ? `<button class="link-btn" type="button" onclick="search('${escapeHtml(cta.prompt).replace(/'/g,"&#39;")}')">${escapeHtml(cta.label || "Continuar")}</button>`
-      : cta.url ? `<a class="link-btn" href="${escapeHtml(cta.url)}" target="_blank" rel="noopener">${escapeHtml(cta.label || "Continuar")}</a>` : "";
-    return sectionShell(section, action);
+  function renderInfoCards(section) {
+    const items = safeArray(section.items);
+    if (!items.length) return "";
+    return `<section class="section panel">${sectionHeader(section)}<div class="grid">${items.map((item) => `
+      <article class="card">
+        <h4>${escapeHtml(item.title || item.label || item.name || "Informação")}</h4>
+        ${item.type ? `<div class="meta">${escapeHtml(item.type)}</div>` : ""}
+        <p>${escapeHtml(item.shortDescription || item.description || item.text || "")}</p>
+      </article>`).join("")}</div></section>`;
+  }
+
+  function renderScholarships(section) {
+    const items = safeArray(section.items);
+    if (!items.length) return "";
+    return `<section class="section panel">${sectionHeader(section)}<div class="grid">${items.map((item) => `
+      <article class="card">
+        <h4>${escapeHtml(item.name || item.title || "Bolsa")}</h4>
+        ${item.type ? `<div class="meta">${escapeHtml(item.type)}</div>` : ""}
+        <p>${escapeHtml(item.shortDescription || item.description || "")}</p>
+        ${safeArray(item.cities).length ? `<div class="tags">${safeArray(item.cities).slice(0,3).map((city) => `<span class="tag">${escapeHtml(city)}</span>`).join("")}</div>` : ""}
+      </article>`).join("")}</div></section>`;
+  }
+
+  function renderCompare(section) {
+    const items = safeArray(section.items);
+    if (items.length < 2) return renderCourseCards({...section, type:"course_cards"});
+    const rows = [
+      ["Cidade", (c) => [c.city, c.state].filter(Boolean).join(" / ")],
+      ["Escola", (c) => c.school || ""],
+      ["Duração", (c) => cleanTag(c.duration) || "A definir"],
+      ["Período", (c) => cleanTag(c.period) || "A definir"],
+      ["Formas de ingresso", (c) => safeArray(c.admissions).join(", ") || "A definir"]
+    ];
+    return `<section class="section panel">${sectionHeader(section)}<div class="table-wrap"><table><thead><tr><th></th>${items.map((course) => `<th>${escapeHtml(course.displayName || course.name || "Curso")}</th>`).join("")}</tr></thead><tbody>${rows.map(([label, getter]) => `<tr><th>${escapeHtml(label)}</th>${items.map((course) => `<td>${escapeHtml(getter(course))}</td>`).join("")}</tr>`).join("")}</tbody></table></div></section>`;
   }
 
   function renderLeadForm(section) {
-    const id = `lead-${Date.now()}`;
-    return sectionShell(section, `
-      <form class="lead-form" onsubmit="saveLead(event, '${id}')">
-        <input name="name" placeholder="Nome" required />
-        <input name="email" placeholder="E-mail" type="email" required />
-        <button type="submit">Enviar</button>
-      </form>
-      <div class="saved" id="${id}">Dados salvos neste protótipo.</div>`);
+    return `<section class="section panel"><h3>${escapeHtml(section.title || "Receba novidades")}</h3><p class="section-intro">${escapeHtml(section.intro || "Deixe seus dados para acompanhar novidades sobre sua busca.")}</p><form class="lead-form" data-lead-form><input name="name" placeholder="Nome" required /><input name="email" type="email" placeholder="E-mail" required /><button type="submit">Enviar</button></form><div class="saved">Dados salvos neste protótipo.</div></section>`;
+  }
+
+  function renderNextStep(section) {
+    const items = safeArray(section.items || section.actions);
+    if (!items.length) return "";
+    return `<section class="continue"><h3>${escapeHtml(section.title || "Continue por aqui")}</h3><p>${escapeHtml(section.intro || "Escolha um caminho para seguir.")}</p><div class="actions">${items.map((item) => `<button class="action-chip ${item.tone === "primary" ? "primary" : ""}" type="button" data-prompt="${escapeHtml(item.prompt || item.text || item.label || "")}">${escapeHtml(item.label || item.text || "Continuar")}</button>`).join("")}</div></section>`;
   }
 
   function renderWarning(section) {
-    return sectionShell(section, safeArray(section.items).map((item) => `<p>${escapeHtml(item.text || "")}</p>`).join(""));
+    return `<section class="section panel compact"><h3>${escapeHtml(section.title || "Não encontrei esse caminho")}</h3><p class="section-intro">${escapeHtml(section.intro || "Tente buscar por cursos, formas de ingresso, bolsas, provas, eventos ou inscrição.")}</p></section>`;
   }
 
-  function renderFollowups(items) {
-    $("#followups").innerHTML = safeArray(items).map((text) => `<button class="chip" type="button">${escapeHtml(text)}</button>`).join("");
-    $("#followups").querySelectorAll(".chip").forEach((btn) => btn.addEventListener("click", () => search(btn.textContent.trim())));
+  function bindDynamicActions() {
+    $$('[data-prompt]').forEach((el) => {
+      el.onclick = () => search(el.getAttribute('data-prompt'));
+    });
+    $$('[data-home]').forEach((el) => { el.onclick = goHome; });
+    $$('[data-lead-form]').forEach((form) => {
+      form.onsubmit = (event) => {
+        event.preventDefault();
+        const payload = Object.fromEntries(new FormData(form).entries());
+        payload.query = $("#topQuery").value || $("#query").value || "";
+        const leads = JSON.parse(localStorage.getItem("fgv_leads") || "[]");
+        leads.push({ ...payload, createdAt: new Date().toISOString() });
+        localStorage.setItem("fgv_leads", JSON.stringify(leads));
+        form.parentElement.querySelector('.saved')?.classList.add('show');
+        form.reset();
+      };
+    });
   }
-
-  window.saveLead = function(event, id) {
-    event.preventDefault();
-    const form = event.target;
-    const payload = Object.fromEntries(new FormData(form).entries());
-    payload.createdAt = new Date().toISOString();
-    const leads = JSON.parse(localStorage.getItem("fgv-leads") || "[]");
-    leads.push(payload);
-    localStorage.setItem("fgv-leads", JSON.stringify(leads));
-    form.reset();
-    document.getElementById(id)?.classList.add("show");
-  };
 
   $("#mainBtn").addEventListener("click", () => search());
   $("#topBtn").addEventListener("click", () => search());
   $("#query").addEventListener("keydown", (event) => { if (event.key === "Enter") search(); });
   $("#topQuery").addEventListener("keydown", (event) => { if (event.key === "Enter") search(); });
   setSuggestions();
+  bindDynamicActions();
 </script>
 </body>
 </html>
