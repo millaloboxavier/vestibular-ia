@@ -241,7 +241,7 @@ async function handleGenerateUi(req, res) {
   if (!apiKey) {
     return res.status(500).json({
       error: "OPENAI_API_KEY não configurada na Vercel.",
-      mode: "openai_unavailable"
+      mode: "missing_api_key"
     });
   }
 
@@ -330,20 +330,46 @@ ${JSON.stringify(compactData)}`;
     const result = await response.json();
 
     if (!response.ok) {
-      return res.status(response.status).json({
-        error: "A chamada para a OpenAI falhou.",
+      return res.status(response.status >= 400 && response.status < 600 ? response.status : 502).json({
+        error: "A OpenAI não conseguiu gerar a resposta.",
         mode: "openai_error",
         status: response.status,
         details: result
       });
     }
 
-    const text = result.output_text || result.output?.flatMap((item) => item.content || []).find((content) => content.type === "output_text")?.text || "";
-    const parsed = JSON.parse(text);
+    const text =
+      result.output_text ||
+      result.output?.flatMap((item) => item.content || []).find((content) => content.type === "output_text")?.text ||
+      "";
 
-    return res.status(200).json({ ...enrichPlan(parsed, message), debug: { mode: "openai", model } });
+    if (!text) {
+      return res.status(502).json({
+        error: "A OpenAI respondeu sem conteúdo estruturado.",
+        mode: "openai_empty_response"
+      });
+    }
+
+    let parsed;
+    try {
+      parsed = JSON.parse(text);
+    } catch (parseError) {
+      return res.status(502).json({
+        error: "A OpenAI respondeu em um formato inesperado.",
+        mode: "openai_parse_error",
+        details: parseError.message
+      });
+    }
+
+    return res.status(200).json({
+      ...enrichPlan(parsed, message),
+      debug: {
+        mode: "openai",
+        model
+      }
+    });
   } catch (error) {
-    return res.status(500).json({
+    return res.status(502).json({
       error: "Não foi possível gerar a resposta com a OpenAI.",
       mode: "openai_exception",
       details: error.message
