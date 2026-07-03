@@ -316,9 +316,9 @@ function admissionItems(message, courses = [], admissionIds = []) {
   }));
 }
 
-function representativeCourses(limit = 6) {
+function representativeCourses(limit = 999) {
   const seen = new Set();
-  const preferredCities = ["São Paulo", "Rio de Janeiro", "Brasília"];
+  const preferredCities = ["Rio de Janeiro", "São Paulo", "Brasília"];
   const ordered = [];
   preferredCities.forEach((city) => {
     safeArray(data.courses).forEach((course) => {
@@ -411,6 +411,9 @@ function resolveSections(plan, message) {
   const sig = querySignals(message);
   const cityHints = cityHits(message, plan.entities?.cities);
   let selectedCourses = matchCoursesFromText(message, plan.entities?.courseIds || plan.entities?.courses || [], cityHints);
+  if (sig.asksCourse && !selectedCourses.length && !sig.asksCompare && !cityHints.length) {
+    selectedCourses = representativeCourses();
+  }
   const selectedAdmissions = matchAdmissionTypes(message, plan.entities?.admissionTypeIds || plan.entities?.admissionTypes || []);
   const resolved = [];
   const addSection = (section) => {
@@ -450,8 +453,8 @@ function resolveSections(plan, message) {
         type: "course_cards",
         title: "Enquanto isso, conheça os cursos",
         intro: "Você também pode explorar as opções de graduação por cidade antes da abertura das inscrições.",
-        layout: "cards",
-        items: representativeCourses(6),
+        layout: "tabs_by_city",
+        items: representativeCourses(),
         actions: []
       });
     }
@@ -462,7 +465,7 @@ function resolveSections(plan, message) {
       const courses = matchCoursesFromText(message, section.courseIds, cityHints);
       if (courses.length) {
         selectedCourses = selectedCourses.length ? selectedCourses : courses;
-        addSection({ ...sectionBase(section, "course_cards", "Cursos relacionados", "Veja os cursos que mais se aproximam do que você buscou."), items: courses });
+        addSection({ ...sectionBase(section, "course_cards", "Cursos relacionados", "Veja os cursos que mais se aproximam do que você buscou.", courses.length > 1 ? "tabs_by_city" : "cards"), items: courses });
       }
     }
 
@@ -519,7 +522,7 @@ function resolveSections(plan, message) {
   });
 
   if (sig.asksCourse && selectedCourses.length && !resolved.some((section) => section.type === "course_cards") && !sig.asksDate) {
-    addSection({ type: "course_cards", title: "Cursos relacionados", intro: "Encontrei estas opções a partir da sua busca.", layout: "cards", items: selectedCourses, actions: [] });
+    addSection({ type: "course_cards", title: selectedCourses.length === safeArray(data.courses).length ? "Cursos por cidade" : "Cursos relacionados", intro: selectedCourses.length === safeArray(data.courses).length ? "Navegue pelos cursos disponíveis em cada cidade." : "Encontrei estas opções a partir da sua busca.", layout: selectedCourses.length > 1 ? "tabs_by_city" : "cards", items: selectedCourses, actions: [] });
   }
 
   if ((sig.asksAdmission || sig.asksDate) && !resolved.some((section) => section.type === "admission_options") && !selectedCourses.length) {
@@ -671,7 +674,7 @@ const RESPONSE_SCHEMA = {
           type: { type: "string", enum: ["course_cards", "course_compare", "admission_options", "events", "scholarships", "course_differentials", "school_recognitions", "timeline", "prep_materials", "next_step", "lead_form", "warning"] },
           title: { type: "string" },
           intro: { type: "string" },
-          layout: { type: "string", enum: ["cards", "list", "table", "single", "form", "chips"] },
+          layout: { type: "string", enum: ["cards", "tabs_by_city", "list", "table", "single", "form", "chips"] },
           courseIds: { type: "array", items: { type: "string" } },
           admissionTypeIds: { type: "array", items: { type: "string" } },
           materialIds: { type: "array", items: { type: "string" } },
@@ -703,7 +706,7 @@ Regras obrigatórias:
 - Responda apenas com JSON válido no schema.
 - Use somente IDs que aparecem na BASE_DO_SITE.
 - Não invente prazos, valores, vagas, regras, reconhecimentos, bolsas ou eventos.
-- Trate esta interface como o próprio site do Vestibular FGV. Nunca escreva "consulte", "acesse", "página oficial", "site oficial", "página do Vestibular", "abrir site" nem qualquer frase que pareça mandar o usuário para outro site. Use "veja abaixo", "nesta página" ou apresente a informação diretamente.
+- Trate esta interface como o próprio site do Vestibular FGV. Nunca escreva "consulte", "acesse", "página oficial", "site oficial", "página do Vestibular", "abrir site", "ver página" nem qualquer frase que pareça mandar o usuário para outro site ou para outra página. Use "veja abaixo", "nesta página" ou apresente a informação diretamente.
 - O texto deve parecer interface final para vestibulandos: claro, humano, útil, sem mencionar IA, JSON, componente, intenção, confiança, protótipo ou sistema.
 - A resposta inicial pode explicar um pouco o caminho encontrado, mas deve ir direto ao ponto.
 - Para pergunta sobre datas, inscrição, prazo ou vestibular, use timeline, admission_options e, quando a pergunta for geral, course_cards. Se a base tiver startDate e endDate, cite o período explicitamente no answer, por exemplo "As inscrições estão previstas para 27/07/2026 a 16/09/2026".
