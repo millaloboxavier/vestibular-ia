@@ -1,1335 +1,378 @@
-<html lang="pt-BR"><head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Vestibular FGV — encontre seu caminho</title>
-  <style>
-    :root {
-      --bg: #f7f7f5;
-      --paper: #ffffff;
-      --ink: #171717;
-      --muted: #666660;
-      --line: #deded8;
-      --soft: #eeeeea;
-      --soft-2: #f4f4f0;
-      --accent: #171717;
-      --ok: #245f44;
-      --warn: #8a5b12;
-      --blueprint: #edf1ff;
-    }
-
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: var(--bg);
-      color: var(--ink);
-    }
-
-    a { color: inherit; }
-
-    .topbar {
-      position: sticky;
-      top: 0;
-      z-index: 20;
-      background: rgba(255,255,255,.92);
-      backdrop-filter: blur(10px);
-      border-bottom: 1px solid var(--line);
-    }
-
-    .topbar-inner {
-      max-width: 1180px;
-      margin: 0 auto;
-      padding: 14px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-    }
-
-
-
-    .top-search {
-      display: none;
-      max-width: 1180px;
-      margin: 0 auto;
-      padding: 0 20px 14px;
-    }
-
-    .top-search.show { display: block; }
-
-    .top-search .query-box {
-      max-width: 760px;
-      margin: 0 auto;
-      background: #ffffff;
-    }
-
-    .top-search .query-input {
-      padding: 10px 12px;
-    }
-
-    .top-search .send {
-      padding: 10px 15px;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-weight: 750;
-      letter-spacing: -.02em;
-    }
-
-    .mark {
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      background: var(--ink);
-      display: inline-block;
-    }
-
-    .nav {
-      display: flex;
-      gap: 4px;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-    }
-
-    .nav a, .ghost-btn {
-      border: 1px solid transparent;
-      background: transparent;
-      color: var(--muted);
-      font-size: 13px;
-      text-decoration: none;
-      padding: 8px 10px;
-      border-radius: 999px;
-      cursor: pointer;
-    }
-
-    .nav a:hover, .ghost-btn:hover {
-      border-color: var(--line);
-      color: var(--ink);
-      background: var(--soft-2);
-    }
-
-    .shell {
-      max-width: 1180px;
-      margin: 0 auto;
-      padding: 34px 20px 80px;
-    }
-
-    .hero {
-      display: grid;
-      grid-template-columns: minmax(0, 1.1fr) minmax(320px, .9fr);
-      gap: 28px;
-      align-items: stretch;
-      margin-bottom: 22px;
-    }
-
-    .hero-card, .panel, .component, .aside-card {
-      background: var(--paper);
-      border: 1px solid var(--line);
-      border-radius: 22px;
-      box-shadow: 0 1px 0 rgba(0,0,0,.02);
-    }
-
-    .hero-card {
-      padding: 34px;
-      min-height: 350px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-
-    .eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      width: fit-content;
-      color: var(--muted);
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: .08em;
-      margin-bottom: 18px;
-    }
-
-    .eyebrow::before {
-      content: "";
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--ok);
-    }
-
-    h1 {
-      font-size: clamp(32px, 5vw, 58px);
-      line-height: .96;
-      letter-spacing: -.06em;
-      margin: 0 0 18px;
-      max-width: 780px;
-    }
-
-    .lead {
-      color: var(--muted);
-      font-size: 17px;
-      line-height: 1.55;
-      max-width: 680px;
-      margin: 0 0 28px;
-    }
-
-    .query-box {
-      display: flex;
-      gap: 10px;
-      background: var(--soft-2);
-      border: 1.5px solid var(--line);
-      border-radius: 22px;
-      padding: 8px;
-      align-items: center;
-    }
-
-    .query-box:focus-within {
-      border-color: var(--ink);
-      box-shadow: 0 0 0 4px rgba(0,0,0,.04);
-    }
-
-    .query-input {
-      width: 100%;
-      border: 0;
-      background: transparent;
-      font-size: 15px;
-      outline: none;
-      padding: 12px 12px;
-      color: var(--ink);
-    }
-
-    .send {
-      border: 0;
-      background: var(--accent);
-      color: white;
-      border-radius: 16px;
-      padding: 12px 16px;
-      font-weight: 700;
-      cursor: pointer;
-      white-space: nowrap;
-    }
-
-    .send[disabled] {
-      opacity: .55;
-      cursor: default;
-    }
-
-    .suggestions {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-top: 16px;
-    }
-
-    .chip {
-      border: 1px solid var(--line);
-      background: white;
-      padding: 9px 12px;
-      border-radius: 999px;
-      font-size: 13px;
-      color: var(--muted);
-      cursor: pointer;
-    }
-
-    .chip:hover {
-      color: var(--ink);
-      border-color: #bdbdb5;
-      background: var(--soft-2);
-    }
-
-    .concept-card {
-      padding: 22px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .mini-title {
-      font-size: 12px;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: .08em;
-      font-weight: 700;
-    }
-
-    .flow {
-      display: grid;
-      gap: 10px;
-    }
-
-    .flow-step {
-      display: grid;
-      grid-template-columns: 30px 1fr;
-      gap: 10px;
-      align-items: start;
-      padding: 12px;
-      background: var(--soft-2);
-      border-radius: 14px;
-      border: 1px solid var(--line);
-    }
-
-    .flow-step b:first-child {
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      background: var(--ink);
-      color: white;
-      display: grid;
-      place-items: center;
-      font-size: 12px;
-    }
-
-    .flow-step strong {
-      display: block;
-      margin-bottom: 2px;
-      font-size: 13px;
-    }
-
-    .flow-step span {
-      display: block;
-      color: var(--muted);
-      font-size: 12.5px;
-      line-height: 1.35;
-    }
-
-    .status {
-      display: none;
-      margin: 20px 0;
-      background: #fff8e6;
-      border: 1px solid #ead9ab;
-      color: var(--warn);
-      border-radius: 16px;
-      padding: 12px 14px;
-      font-size: 13px;
-    }
-
-    .status.show { display: block; }
-
-    .results {
-      display: none;
-      grid-template-columns: minmax(0, 1fr) 300px;
-      gap: 18px;
-      align-items: start;
-    }
-
-    .results.show { display: grid; }
-
-    .panel {
-      padding: 20px;
-      margin-bottom: 14px;
-    }
-
-    .intent-head {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 14px;
-      margin-bottom: 12px;
-    }
-
-    .intent-head h2 {
-      margin: 0 0 6px;
-      font-size: 24px;
-      letter-spacing: -.03em;
-    }
-
-    .intent-head p {
-      margin: 0;
-      color: var(--muted);
-      line-height: 1.48;
-    }
-
-
-
-    .search-context {
-      margin-top: 14px;
-      padding-top: 14px;
-      border-top: 1px solid var(--line);
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.4;
-    }
-
-    .search-context b {
-      color: var(--ink);
-    }
-
-    .link-strip {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-top: 8px;
-    }
-
-    .link-strip a {
-      display: inline-flex;
-      align-items: center;
-      text-decoration: none;
-      border: 1px solid var(--line);
-      background: var(--soft-2);
-      color: var(--ink);
-      border-radius: 999px;
-      padding: 8px 11px;
-      font-size: 12px;
-      font-weight: 700;
-    }
-
-    .component.compact {
-      padding: 16px 18px;
-      background: transparent;
-      box-shadow: none;
-    }
-
-    .component.compact h3 {
-      font-size: 15px;
-    }
-
-    .badge {
-      border: 1px solid var(--line);
-      background: var(--blueprint);
-      color: #26305f;
-      border-radius: 999px;
-      padding: 7px 10px;
-      font-size: 12px;
-      white-space: nowrap;
-    }
-
-    .journey {
-      display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
-      gap: 6px;
-      margin-top: 16px;
-    }
-
-    .journey-step {
-      background: var(--soft-2);
-      color: var(--muted);
-      border: 1px solid var(--line);
-      padding: 9px 8px;
-      border-radius: 12px;
-      font-size: 12px;
-      text-align: center;
-    }
-
-    .journey-step.active {
-      background: var(--ink);
-      color: white;
-      border-color: var(--ink);
-    }
-
-    .component {
-      padding: 20px;
-      margin-bottom: 14px;
-    }
-
-    .component h3 {
-      margin: 0 0 10px;
-      font-size: 18px;
-      letter-spacing: -.02em;
-    }
-
-    .component p {
-      margin: 0 0 12px;
-      color: var(--muted);
-      line-height: 1.48;
-      font-size: 14px;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px;
-    }
-
-    .data-card {
-      border: 1px solid var(--line);
-      background: var(--soft-2);
-      border-radius: 16px;
-      padding: 14px;
-      min-height: 140px;
-    }
-
-    .data-card h4 {
-      margin: 0 0 4px;
-      font-size: 15px;
-    }
-
-    .data-card .meta {
-      color: var(--muted);
-      font-size: 12px;
-      margin-bottom: 10px;
-    }
-
-    .data-card p {
-      font-size: 13px;
-      margin-bottom: 10px;
-    }
-
-    .tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 5px;
-    }
-
-    .tag {
-      border: 1px solid var(--line);
-      background: white;
-      color: var(--muted);
-      border-radius: 999px;
-      padding: 5px 7px;
-      font-size: 11px;
-    }
-
-    .table-wrap { overflow-x: auto; }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13px;
-      min-width: 620px;
-    }
-
-    th, td {
-      border: 1px solid var(--line);
-      padding: 10px;
-      text-align: left;
-      vertical-align: top;
-    }
-
-    th { background: var(--soft-2); }
-
-    .list {
-      display: grid;
-      gap: 8px;
-    }
-
-    .list-item {
-      border: 1px solid var(--line);
-      background: var(--soft-2);
-      border-radius: 14px;
-      padding: 12px;
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 12px;
-    }
-
-    .list-item b {
-      display: block;
-      font-size: 14px;
-      margin-bottom: 3px;
-    }
-
-    .list-item span {
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.4;
-    }
-
-    .link-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      text-decoration: none;
-      border: 1px solid var(--ink);
-      color: var(--ink);
-      border-radius: 999px;
-      padding: 8px 11px;
-      font-size: 12px;
-      font-weight: 700;
-      white-space: nowrap;
-      background: white;
-    }
-
-    .primary-cta {
-      display: inline-flex;
-      text-decoration: none;
-      background: var(--ink);
-      color: white;
-      border-radius: 999px;
-      padding: 11px 14px;
-      font-weight: 800;
-      font-size: 13px;
-      margin-top: 12px;
-    }
-
-    .aside {
-      position: sticky;
-      top: 74px;
-      display: grid;
-      gap: 14px;
-    }
-
-    .aside-card {
-      padding: 18px;
-    }
-
-    .aside-card h3 {
-      margin: 0 0 10px;
-      font-size: 15px;
-    }
-
-    .next-action {
-      border: 1.5px solid var(--ink);
-      background: #fbfbf8;
-      border-radius: 18px;
-      padding: 16px;
-      margin-top: 14px;
-    }
-
-    .next-action b {
-      display: block;
-      font-size: 15px;
-      margin-bottom: 4px;
-    }
-
-    .next-action span {
-      display: block;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.45;
-      margin-bottom: 12px;
-    }
-
-    .lead-form {
-      display: grid;
-      gap: 10px;
-      margin-top: 14px;
-    }
-
-    .lead-form label {
-      display: grid;
-      gap: 5px;
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 700;
-    }
-
-    .lead-form input, .lead-form select {
-      width: 100%;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      padding: 11px 12px;
-      background: white;
-      color: var(--ink);
-      font: inherit;
-      font-size: 14px;
-      font-weight: 500;
-    }
-
-    .form-note {
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.45;
-      margin-top: 8px;
-    }
-
-    .lead-success {
-      display: none;
-      background: #edf7f1;
-      border: 1px solid #bed8c8;
-      color: var(--ok);
-      border-radius: 12px;
-      padding: 10px;
-      font-size: 13px;
-      line-height: 1.4;
-    }
-
-    .lead-success.show { display: block; }
-
-    .debug {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      font-size: 11px;
-      line-height: 1.45;
-      white-space: pre-wrap;
-      color: var(--muted);
-      background: var(--soft-2);
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      padding: 10px;
-      max-height: 220px;
-      overflow: auto;
-    }
-
-    .footer-note {
-      margin-top: 30px;
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.5;
-      text-align: center;
-    }
-
-    @media (max-width: 900px) {
-      .hero, .results { grid-template-columns: 1fr; }
-      .aside { position: static; }
-      .grid { grid-template-columns: 1fr; }
-      .journey { grid-template-columns: 1fr; }
-      .topbar-inner { align-items: flex-start; flex-direction: column; }
-      .top-search { padding: 0 20px 12px; }
-      .top-search .query-box { max-width: none; }
-      .nav { justify-content: flex-start; }
-    }
-  </style>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Vestibular FGV</title>
+<style>
+  :root{
+    --bg:#f7f7f4;
+    --panel:#fff;
+    --ink:#151515;
+    --muted:#62625d;
+    --line:#deded8;
+    --soft:#f1f1ee;
+    --accent:#151515;
+    --warn:#8b5a00;
+    --warn-bg:#fff8e7;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+  a{color:inherit;text-decoration:none}
+  header{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--line)}
+  .header-inner{max-width:1180px;margin:0 auto;padding:18px 22px;display:flex;align-items:center;gap:24px;justify-content:space-between}
+  .brand{display:flex;align-items:center;gap:12px;font-size:22px;font-weight:800;white-space:nowrap}
+  .mark{width:34px;height:34px;border-radius:50%;background:#151515;display:inline-block}
+  nav{display:flex;gap:20px;color:var(--muted);font-size:16px;white-space:nowrap;overflow:hidden}
+  nav a:hover{color:#111}
+  .hero{max-width:1180px;margin:0 auto;padding:70px 22px 48px;display:grid;grid-template-columns:1.05fr .95fr;gap:28px;align-items:start}
+  .hero-card,.side-card,.component,.result-head{background:var(--panel);border:1px solid var(--line);border-radius:28px;box-shadow:0 1px 0 rgba(0,0,0,.02)}
+  .hero-card{padding:40px}
+  h1{font-size:50px;line-height:1.02;margin:0 0 16px;letter-spacing:-.05em}
+  .lead{font-size:21px;line-height:1.45;color:var(--muted);margin:0 0 28px}
+  .search-wrap{position:relative}
+  .search-input{width:100%;border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:20px 132px 20px 24px;font-size:18px;outline:none;box-shadow:inset 0 0 0 1px transparent}
+  .search-input:focus{border-color:#111;box-shadow:0 0 0 4px rgba(0,0,0,.04)}
+  .search-btn{position:absolute;right:8px;top:8px;border:0;background:#111;color:#fff;border-radius:999px;padding:13px 28px;font-size:17px;font-weight:800;cursor:pointer}
+  .search-btn:disabled{opacity:.55;cursor:default}
+  .suggestions{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+  .chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:10px 14px;font-size:14px;color:#333;cursor:pointer}
+  .chip:hover{border-color:#111}
+  .side-card{padding:28px}
+  .side-card h2{font-size:24px;margin:0 0 14px}
+  .path-list{display:grid;gap:12px;margin-top:18px}
+  .path{padding:16px;border:1px solid var(--line);border-radius:18px;background:var(--soft)}
+  .path b{display:block;margin-bottom:4px}
+  .path span{color:var(--muted);font-size:14px;line-height:1.35}
+  .top-search{display:none;position:sticky;top:71px;z-index:15;background:rgba(247,247,244,.96);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding:14px 22px}
+  .top-search.show{display:block}
+  .top-search .search-wrap{max-width:820px;margin:0 auto}
+  .top-search .search-input{padding:15px 118px 15px 22px;font-size:16px}
+  .top-search .search-btn{top:6px;right:7px;padding:10px 24px;font-size:15px}
+  .results{max-width:1180px;margin:0 auto;padding:34px 22px 70px;display:none}
+  .results.show{display:block}
+  .result-head{padding:30px 34px;margin-bottom:22px}
+  .result-head h2{font-size:36px;line-height:1.08;margin:0 0 12px;letter-spacing:-.04em}
+  .result-head p{font-size:20px;color:var(--muted);line-height:1.45;margin:0}
+  .query-line{margin-top:16px;color:var(--muted);font-size:15px}
+  .primary-cta{display:inline-flex;margin-top:18px;background:#111;color:#fff;border-radius:999px;padding:13px 20px;font-weight:800}
+  .component{padding:28px 32px;margin-bottom:22px}
+  .component h3{font-size:29px;letter-spacing:-.04em;margin:0 0 10px}
+  .component p.section-intro{font-size:18px;color:var(--muted);line-height:1.45;margin:0 0 22px}
+  .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+  .card,.list-item{border:1px solid var(--line);border-radius:22px;background:var(--soft);padding:22px}
+  .card h4{font-size:22px;line-height:1.15;margin:0 0 7px}
+  .meta{color:var(--muted);font-size:15px;margin-bottom:14px}
+  .card p{color:var(--muted);font-size:16px;line-height:1.45;margin:0 0 16px}
+  .tags{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+  .tag{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 10px;color:#555;font-size:13px}
+  .link-btn{display:inline-flex;align-items:center;gap:6px;border:1.5px solid #111;border-radius:999px;padding:9px 16px;background:#fff;font-weight:800;cursor:pointer}
+  .list{display:grid;gap:12px}
+  .list-item{display:flex;justify-content:space-between;gap:18px;align-items:center}
+  .list-item b{display:block;font-size:18px;margin-bottom:4px}
+  .list-item span{display:block;color:var(--muted);line-height:1.4}
+  .table-wrap{overflow:auto;border:1px solid var(--line);border-radius:18px;background:#fff}
+  table{width:100%;border-collapse:collapse;min-width:720px}
+  th,td{border-bottom:1px solid var(--line);padding:14px 16px;text-align:left;vertical-align:top}
+  th{background:var(--soft);font-weight:800}
+  tr:last-child th,tr:last-child td{border-bottom:0}
+  .event-row{display:grid;grid-template-columns:110px 1fr auto;gap:18px;align-items:center;border:1px solid var(--line);background:var(--soft);border-radius:22px;padding:18px;margin-bottom:12px}
+  .date-box{background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px;text-align:center;font-weight:800}
+  .date-box span{display:block;color:var(--muted);font-weight:600;font-size:13px;margin-top:4px}
+  .notice{border:1px solid #f0d58a;background:var(--warn-bg);color:var(--warn);border-radius:18px;padding:16px 18px;margin-bottom:22px;font-weight:650;display:none}
+  .notice.show{display:block}
+  .lead-form{display:grid;grid-template-columns:1fr 1fr auto;gap:10px;margin-top:10px}
+  .lead-form input{border:1px solid var(--line);border-radius:999px;padding:13px 15px;font-size:15px}
+  .lead-form button{border:0;background:#111;color:#fff;border-radius:999px;padding:13px 18px;font-weight:800;cursor:pointer}
+  .saved{color:#0f6b43;font-weight:700;margin-top:10px;display:none}
+  .saved.show{display:block}
+  .followups{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+  .empty{color:var(--muted);padding:18px;border:1px dashed var(--line);border-radius:16px}
+  @media(max-width:850px){
+    .hero{grid-template-columns:1fr;padding-top:34px}.hero-card{padding:28px}h1{font-size:38px}.lead{font-size:18px}nav{display:none}.grid{grid-template-columns:1fr}.event-row{grid-template-columns:1fr}.lead-form{grid-template-columns:1fr}.result-head h2{font-size:30px}.component{padding:24px}.component h3{font-size:25px}
+  }
+</style>
 </head>
 <body>
-  <header class="topbar">
-    <div class="topbar-inner">
-      <div class="brand"><span class="mark"></span><span>Vestibular FGV</span></div>
-      <nav class="nav" id="topNav"></nav>
-    </div>
-    <div class="top-search" id="topSearch">
-      <form class="query-box" id="topQueryForm">
-        <input class="query-input" id="topQueryInput" autocomplete="off" placeholder="Faça outra busca: curso, cidade, ENEM, edital, prova...">
-        <button class="send" id="topSendBtn" type="submit">Buscar</button>
-      </form>
-    </div>
-  </header>
+<header>
+  <div class="header-inner">
+    <a class="brand" href="/" aria-label="Vestibular FGV"><span class="mark"></span>Vestibular FGV</a>
+    <nav>
+      <a href="https://vestibular.fgv.br/cursos" target="_blank" rel="noopener">Cursos</a>
+      <a href="https://vestibular.fgv.br/processo-seletivo" target="_blank" rel="noopener">Processo seletivo</a>
+      <a href="https://vestibular.fgv.br/graduacao/formas-de-ingresso" target="_blank" rel="noopener">Formas de ingresso</a>
+    </nav>
+  </div>
+</header>
 
-  <main class="shell">
-    <section class="hero" id="hero">
-      <div class="hero-card">
-        <div class="eyebrow">Graduação FGV</div>
-        <h1>Encontre seu caminho no Vestibular FGV.</h1>
-        <p class="lead">Pergunte do seu jeito. Você pode buscar cursos, comparar opções, ver formas de ingresso, consultar provas anteriores ou entender o próximo passo para se inscrever.</p>
+<div class="top-search" id="topSearch">
+  <div class="search-wrap">
+    <input id="topQuery" class="search-input" placeholder="Pergunte sobre cursos, formas de ingresso, bolsas, eventos ou provas..." />
+    <button id="topBtn" class="search-btn">Buscar</button>
+  </div>
+</div>
 
-        <form class="query-box" id="queryForm">
-          <input class="query-input" id="queryInput" autocomplete="off" placeholder="Ex.: posso usar minha nota do Enem para Direito em SP?">
-          <button class="send" id="sendBtn" type="submit">Buscar</button>
-        </form>
-        <div class="suggestions" id="suggestions"></div>
+<main>
+  <section class="hero" id="hero">
+    <div class="hero-card">
+      <h1>Encontre seu caminho no Vestibular FGV.</h1>
+      <p class="lead">Digite o que você quer saber. Você pode perguntar por curso, cidade, forma de ingresso, bolsa, evento, prova anterior ou inscrição.</p>
+      <div class="search-wrap">
+        <input id="query" class="search-input" placeholder="ex: quero conhecer Administração em São Paulo" autofocus />
+        <button id="mainBtn" class="search-btn">Buscar</button>
       </div>
-
-      <aside class="concept-card panel">
-        <div>
-          <div class="mini-title">Comece por onde quiser</div>
-        </div>
-        <div class="flow">
-          <div class="flow-step"><b>1</b><div><strong>Conheça os cursos</strong><span>Veja opções por cidade, área de interesse e escola.</span></div></div>
-          <div class="flow-step"><b>2</b><div><strong>Compare caminhos</strong><span>Entenda diferenças entre cursos, cidades e formatos.</span></div></div>
-          <div class="flow-step"><b>3</b><div><strong>Prepare-se</strong><span>Acesse provas anteriores, gabaritos, editais e manuais.</span></div></div>
-          <div class="flow-step"><b>4</b><div><strong>Avance na inscrição</strong><span>Confira prazos, formas de ingresso e avisos importantes.</span></div></div>
-        </div>
-      </aside>
-    </section>
-
-    <div class="status" id="status"></div>
-
-    <section class="results" id="results">
-      <div>
-        <div class="panel" id="intentPanel"></div>
-        <div id="componentStack"></div>
+      <div class="suggestions" id="suggestions"></div>
+    </div>
+    <aside class="side-card">
+      <h2>O que você pode buscar</h2>
+      <div class="path-list">
+        <div class="path"><b>Conhecer cursos</b><span>Veja opções por cidade, escola responsável e links oficiais.</span></div>
+        <div class="path"><b>Comparar caminhos</b><span>Compare cursos, formas de ingresso e próximos passos.</span></div>
+        <div class="path"><b>Preparar-se</b><span>Encontre provas anteriores, gabaritos, editais e datas importantes.</span></div>
+        <div class="path"><b>Conhecer a FGV de perto</b><span>Quando houver eventos ativos, veja opções na cidade do curso.</span></div>
       </div>
+    </aside>
+  </section>
 
-      <aside class="aside">
-        <div class="aside-card">
-          <h3>Continue navegando</h3>
-          <div class="suggestions" id="followUps"></div>
-        </div>
-        <div class="aside-card">
-          <h3>Nova busca</h3>
-          <button class="ghost-btn" onclick="resetPrototype()">Fazer outra pergunta</button>
-        </div>
-      </aside>
-    </section>
+  <section class="results" id="results">
+    <div class="notice" id="notice"></div>
+    <div class="result-head" id="resultHead"></div>
+    <div id="sections"></div>
+    <div class="followups" id="followups"></div>
+  </section>
+</main>
 
-    <p class="footer-note" id="footerNote"></p>
-  </main>
+<script>
+  const API_ENDPOINT = "/api/generate-ui";
+  const suggestions = [
+    "quais cursos existem no Rio de Janeiro?",
+    "posso usar minha nota do Enem para Direito em São Paulo?",
+    "quero conhecer Administração em São Paulo",
+    "qual a diferença entre Administração e Administração Pública?",
+    "tem prova antiga para eu treinar?",
+    "quais bolsas a FGV oferece?"
+  ];
 
-  <script>
-    const STAGE_LABELS = {
-      descoberta: "Descoberta",
-      consideracao: "Consideração",
-      decisao: "Decisão",
-      preparacao: "Preparação",
-      pos_inscricao: "Pós-inscrição",
-      indefinida: "Indefinida"
-    };
+  const $ = (selector) => document.querySelector(selector);
+  const escapeHtml = (value = "") => String(value).replace(/[&<>'"]/g, (char) => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;","\"":"&quot;"}[char]));
+  const safeArray = (value) => Array.isArray(value) ? value : [];
 
-    const INTENT_LABELS = {
-      conhecer_cursos: "Conhecer cursos",
-      comparar_cursos: "Comparar cursos",
-      inscricao: "Inscrição, prazo ou edital",
-      formas_ingresso: "Formas de ingresso",
-      enem: "Ingresso via ENEM",
-      provas_gabaritos: "Provas e gabaritos",
-      agenda_editais: "Agenda, editais e manuais",
-      bolsas: "Bolsas de estudo",
-      evento_visita: "Eventos e visita",
-      resultado: "Resultados e matrícula",
-      faq: "Dúvidas frequentes",
-      fora_escopo: "Fora do escopo"
-    };
+  function setSuggestions(items = suggestions) {
+    $("#suggestions").innerHTML = items.map((text) => `<button class="chip" type="button">${escapeHtml(text)}</button>`).join("");
+    document.querySelectorAll(".chip").forEach((btn) => btn.addEventListener("click", () => search(btn.textContent.trim())));
+  }
 
-    let DATA = null;
-    let LAST_PLAN = null;
+  function setLoading(isLoading) {
+    ["#mainBtn", "#topBtn"].forEach((id) => {
+      const btn = $(id);
+      btn.disabled = isLoading;
+      btn.textContent = isLoading ? "Buscando..." : "Buscar";
+    });
+  }
 
-    const $ = (selector) => document.querySelector(selector);
+  function showNotice(text, isError = false) {
+    const box = $("#notice");
+    box.textContent = text || "";
+    box.classList.toggle("show", Boolean(text));
+    box.style.borderColor = isError ? "#e0a5a5" : "#f0d58a";
+    box.style.background = isError ? "#fff2f2" : "var(--warn-bg)";
+    box.style.color = isError ? "#8a2020" : "var(--warn)";
+  }
 
-    function escapeHtml(value = "") {
-      return String(value)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-    }
+  async function search(value) {
+    const message = String(value || $("#query").value || $("#topQuery").value || "").trim();
+    if (!message) return;
 
-    function courseSearchText(course = {}) {
-      const tags = Array.isArray(course.tags) ? course.tags : [];
-      return normalize([
-        course.name,
-        course.displayName,
-        course.school,
-        course.city,
-        course.state,
-        ...tags
-      ].filter(Boolean).join(" "));
-    }
+    $("#query").value = message;
+    $("#topQuery").value = message;
+    setLoading(true);
+    showNotice("");
 
-    function matchCourses(entities = {}) {
-      const requestedCourses = Array.isArray(entities.courses) ? entities.courses.map(normalize).filter(Boolean) : [];
-      const requestedCities = Array.isArray(entities.cities) ? entities.cities.map(normalize).filter(Boolean) : [];
-      const coursesBase = Array.isArray(DATA?.courses) ? DATA.courses : [];
-
-      let matched = coursesBase.filter((course) => {
-        const courseText = courseSearchText(course);
-        const courseOk = !requestedCourses.length || requestedCourses.some((item) => courseText.includes(item) || item.includes(normalize(course.name || course.displayName || "")));
-        const cityOk = !requestedCities.length || requestedCities.includes(normalize(course.city || "")) || requestedCities.includes(normalize(course.state || ""));
-        return courseOk && cityOk;
+    try {
+      const response = await fetch(API_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message })
       });
-
-      if (!matched.length && requestedCities.length) {
-        matched = coursesBase.filter((course) => requestedCities.includes(normalize(course.city || "")) || requestedCities.includes(normalize(course.state || "")));
+      const payload = await response.json();
+      if (!response.ok) {
+        throw new Error(payload.error || "A busca não respondeu agora.");
       }
-
-      if (!matched.length && requestedCourses.length) {
-        matched = coursesBase.filter((course) => {
-          const courseText = courseSearchText(course);
-          return requestedCourses.some((item) => courseText.includes(item) || item.includes(normalize(course.name || course.displayName || "")));
-        });
-      }
-
-      if (!matched.length) matched = coursesBase.slice(0, 6);
-      return matched.slice(0, 8);
-    }
-
-    function normalize(text = "") {
-      return String(text).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
-    }
-
-    function renderTopNav() {
-      $("#topNav").innerHTML = DATA.globalNavigation.slice(0, 5).map((item) =>
-        `<a href="${item.url}" target="_blank" rel="noopener">${escapeHtml(item.label)}</a>`
-      ).join("");
-    }
-
-    function renderSuggestions() {
-      $("#suggestions").innerHTML = DATA.sampleQuestions.map((question) =>
-        `<button class="chip" type="button" data-question="${escapeHtml(question)}">${escapeHtml(question)}</button>`
-      ).join("");
-      document.querySelectorAll("#suggestions .chip").forEach((chip) => {
-        chip.addEventListener("click", () => {
-          $("#queryInput").value = chip.dataset.question;
-          runQuery(chip.dataset.question);
-        });
-      });
-    }
-
-    function setStatus(message, show = true) {
-      const status = $("#status");
-      status.textContent = message || "";
-      status.classList.toggle("show", Boolean(show && message));
-    }
-
-    async function runQuery(message) {
-      if (!message.trim()) return;
-      syncQueryInputs(message);
-      setStatus("Buscando as melhores opções para você...", true);
-      $("#sendBtn").disabled = true;
-      $("#topSendBtn").disabled = true;
-      $("#sendBtn").textContent = "Buscando...";
-      $("#topSendBtn").textContent = "Buscando...";
-
-      try {
-        const response = await fetch("/api/generate-ui", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message })
-        });
-
-        const plan = await response.json().catch(() => ({}));
-
-        if (!response.ok) {
-          throw new Error(plan.error || `Erro HTTP ${response.status}`);
-        }
-
-        if (plan?.debug?.mode && plan.debug.mode !== "openai") {
-          throw new Error("A resposta recebida não veio da IA.");
-        }
-
-        LAST_PLAN = plan;
-        renderPlan(plan, message);
-        setStatus("", false);
-      } catch (error) {
-        console.error("Falha na busca ou na montagem da interface:", error);
-        LAST_PLAN = null;
-        setStatus("A busca não conseguiu montar a resposta agora. Confira a aba Console/Network para ver o detalhe do erro.", true);
-      } finally {
-        $("#sendBtn").disabled = false;
-        $("#topSendBtn").disabled = false;
-        $("#sendBtn").textContent = "Buscar";
-        $("#topSendBtn").textContent = "Buscar";
-      }
-    }
-
-    function completePlan(plan) {
-      if (!plan || !plan.intent || !plan.entities || !Array.isArray(plan.components) || !plan.nextStep || !plan.leadCapture) {
-        throw new Error("Resposta incompleta da IA.");
-      }
-
-      const normalizedComponents = [...new Set(plan.components || [])];
-      if (!normalizedComponents.includes("next_steps")) normalizedComponents.push("next_steps");
-      if (plan.leadCapture?.show && !normalizedComponents.includes("lead_form")) normalizedComponents.push("lead_form");
-      plan.components = normalizedComponents;
-      return plan;
-    }
-
-    function renderPlan(plan, originalMessage) {
-      plan = completePlan(plan);
-      syncQueryInputs(originalMessage);
+      renderPlan(payload, message);
+    } catch (error) {
+      console.error(error);
       $("#hero").style.display = "none";
       $("#topSearch").classList.add("show");
       $("#results").classList.add("show");
-      renderIntentPanel(plan, originalMessage);
-      renderComponents(plan);
-      renderFollowUps(plan.followUpSuggestions || []);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      $("#resultHead").innerHTML = `<h2>Não foi possível montar a resposta agora.</h2><p>Tente novamente em instantes. Se o erro continuar, confira a configuração da chave da OpenAI na Vercel.</p>`;
+      $("#sections").innerHTML = "";
+      $("#followups").innerHTML = "";
+      showNotice(error.message, true);
+    } finally {
+      setLoading(false);
     }
+  }
 
+  function renderPlan(plan, originalMessage) {
+    $("#hero").style.display = "none";
+    $("#topSearch").classList.add("show");
+    $("#results").classList.add("show");
+    $("#resultHead").innerHTML = `
+      <h2>${escapeHtml(plan.pageTitle || "O que encontrei para você")}</h2>
+      <p>${escapeHtml(plan.answer || "Veja as informações relacionadas à sua busca.")}</p>
+      <div class="query-line"><b>Sua busca:</b> ${escapeHtml(originalMessage)}</div>
+      ${plan.primaryCta?.url ? `<a class="primary-cta" href="${escapeHtml(plan.primaryCta.url)}" target="_blank" rel="noopener">${escapeHtml(plan.primaryCta.label || "Abrir página oficial")}</a>` : ""}
+    `;
+    $("#sections").innerHTML = safeArray(plan.sections).map(renderSection).join("") || `<div class="component"><div class="empty">Não encontrei uma seção para esta busca. Tente reformular com o nome do curso, cidade ou forma de ingresso.</div></div>`;
+    renderFollowups(plan.followUpSuggestions || []);
+    window.scrollTo({top:0,behavior:"smooth"});
+  }
 
+  function renderSection(section) {
+    const type = section.type;
+    if (type === "course_cards") return renderCardsSection(section, renderCourseCard);
+    if (type === "course_compare") return renderCourseCompare(section);
+    if (type === "admission_options") return renderListSection(section, renderAdmissionItem);
+    if (type === "events") return renderEvents(section);
+    if (type === "scholarships") return renderListSection(section, renderScholarshipItem);
+    if (type === "course_differentials") return renderCardsSection(section, renderDifferentialCard);
+    if (type === "timeline") return renderListSection(section, renderTimelineItem);
+    if (type === "prep_materials" || type === "official_links") return renderListSection(section, renderLinkItem);
+    if (type === "lead_form") return renderLeadForm(section);
+    if (type === "next_step") return renderNextStep(section);
+    if (type === "warning") return renderWarning(section);
+    return "";
+  }
 
-    function syncQueryInputs(value = "") {
-      const text = String(value || "");
-      const main = document.getElementById("queryInput");
-      const top = document.getElementById("topQueryInput");
-      if (main) main.value = text;
-      if (top) top.value = text;
-    }
+  function sectionShell(section, content) {
+    return `
+      <section class="component component-${escapeHtml(section.type)}">
+        <h3>${escapeHtml(section.title || "Veja também")}</h3>
+        ${section.intro ? `<p class="section-intro">${escapeHtml(section.intro)}</p>` : ""}
+        ${content}
+        ${section.cta?.url ? `<a class="link-btn" style="margin-top:18px" href="${escapeHtml(section.cta.url)}" target="_blank" rel="noopener">${escapeHtml(section.cta.label || "Abrir")}</a>` : ""}
+      </section>`;
+  }
 
-    function buildResultTitle(plan) {
-      const entities = plan.entities || {};
-      const cities = entities.cities || [];
-      const courses = entities.courses || [];
-      const firstCity = cities[0] || "";
-      const firstCourse = courses[0] || "";
+  function renderCardsSection(section, itemRenderer) {
+    const items = safeArray(section.items);
+    if (!items.length) return "";
+    return sectionShell(section, `<div class="grid">${items.map(itemRenderer).join("")}</div>`);
+  }
 
-      if (plan.intent === "conhecer_cursos" && firstCity) return `Cursos da FGV em ${firstCity}`;
-      if (plan.intent === "conhecer_cursos") return "Cursos que podem combinar com você";
-      if (plan.intent === "comparar_cursos") return courses.length >= 2 ? "Comparação entre cursos" : "Compare cursos da FGV";
-      if (plan.intent === "enem") return firstCourse ? `Ingresso via ENEM para ${firstCourse}` : "Ingresso via ENEM";
-      if (plan.intent === "inscricao" || plan.intent === "agenda_editais") return firstCourse ? `Inscrição para ${firstCourse}` : "Inscrição e processo seletivo";
-      if (plan.intent === "provas_gabaritos") return "Provas anteriores e gabaritos";
-      if (plan.intent === "formas_ingresso") return "Formas de ingresso na FGV";
-      if (plan.intent === "evento_visita") return "Conheça a experiência FGV";
-      if (plan.intent === "resultado") return "Resultados e acompanhamento";
-      if (plan.intent === "fora_escopo") return "Busque informações do Vestibular FGV";
-      return INTENT_LABELS[plan.intent] || "O que encontrei para você";
-    }
+  function renderListSection(section, itemRenderer) {
+    const items = safeArray(section.items);
+    if (!items.length) return "";
+    return sectionShell(section, `<div class="list">${items.map(itemRenderer).join("")}</div>`);
+  }
 
-    function usefulValue(value = "") {
-      const text = String(value || "").trim();
-      if (!text) return false;
-      const n = normalize(text);
-      return !n.includes("consultar pagina") && !n.includes("a confirmar") && !n.includes("indicado na pagina");
-    }
+  function renderCourseCard(course) {
+    const pills = [course.duration, course.period, course.entry].filter(Boolean).slice(0,3);
+    return `
+      <article class="card">
+        <h4>${escapeHtml(course.displayName || course.name || "Curso")}</h4>
+        <div class="meta">${escapeHtml([course.school, course.city && `${course.city} / ${course.state || ""}`].filter(Boolean).join(" · "))}</div>
+        <p>${escapeHtml(course.summary || "Abra a página oficial para conferir detalhes do curso.")}</p>
+        ${pills.length ? `<div class="tags">${pills.map((pill) => `<span class="tag">${escapeHtml(pill)}</span>`).join("")}</div>` : ""}
+        ${course.url ? `<a class="link-btn" href="${escapeHtml(course.url)}" target="_blank" rel="noopener">Abrir curso</a>` : ""}
+      </article>`;
+  }
 
+  function renderCourseCompare(section) {
+    const courses = safeArray(section.items).slice(0,3);
+    if (courses.length < 2) return renderCardsSection({ ...section, type:"course_cards", title: section.title || "Cursos relacionados" }, renderCourseCard);
+    const rows = [
+      ["Cidade", "city"],
+      ["Escola", "school"],
+      ["Duração", "duration"],
+      ["Período", "period"],
+      ["Mensalidade", "tuition"],
+      ["Formas de ingresso", "admissions"]
+    ];
+    const table = `<div class="table-wrap"><table>
+      <tr><th>Critério</th>${courses.map((course) => `<th>${escapeHtml(course.displayName || course.name)}<br><span style="color:var(--muted);font-weight:500">${escapeHtml(course.city || "")}</span></th>`).join("")}</tr>
+      ${rows.map(([label,key]) => `<tr><th>${escapeHtml(label)}</th>${courses.map((course) => `<td>${escapeHtml(Array.isArray(course[key]) ? course[key].join(", ") : (course[key] || "Consultar página do curso"))}</td>`).join("")}</tr>`).join("")}
+    </table></div>`;
+    return sectionShell(section, table);
+  }
 
-    function displayCourseValue(value) {
-      if (Array.isArray(value)) return value.filter(usefulValue).join(", ") || "Consultar página do curso";
-      return usefulValue(value) ? String(value) : "Consultar página do curso";
-    }
+  function renderAdmissionItem(item) {
+    return `<div class="list-item"><div><b>${escapeHtml(item.label || item.name)}</b><span>${escapeHtml([item.description, item.status].filter(Boolean).join(" "))}</span></div>${item.url ? `<a class="link-btn" href="${escapeHtml(item.url)}" target="_blank" rel="noopener">Ver</a>` : ""}</div>`;
+  }
 
-    function coursePills(course) {
-      return [course.duration, course.period, course.entry]
-        .filter(usefulValue)
-        .slice(0, 3);
-    }
+  function renderScholarshipItem(item) {
+    return `<div class="list-item"><div><b>${escapeHtml(item.name || item.title)}</b><span>${escapeHtml(item.shortDescription || item.description || "Consulte as regras da bolsa na página oficial.")}</span></div>${item.cta?.url || item.url ? `<a class="link-btn" href="${escapeHtml(item.cta?.url || item.url)}" target="_blank" rel="noopener">Ver</a>` : ""}</div>`;
+  }
 
-    function renderIntentPanel(plan, originalMessage) {
-      const title = buildResultTitle(plan);
-      const officialCheck = plan.entities?.needsOfficialCheck
-        ? `<p class="search-context">Antes de avançar, confira prazos e regras no edital ou na página oficial do curso.</p>`
-        : "";
+  function renderDifferentialCard(item) {
+    return `<article class="card"><h4>${escapeHtml(item.title || "Diferencial")}</h4>${item.courseName ? `<div class="meta">${escapeHtml(item.courseName)}</div>` : ""}<p>${escapeHtml(item.shortDescription || item.description || "")}</p></article>`;
+  }
 
-      const ctaUrl = plan.primaryCta?.url || DATA.meta.officialSite;
-      const ctaLabel = plan.primaryCta?.label || "Ver página oficial";
+  function renderTimelineItem(item) {
+    return `<div class="list-item"><div><b>${escapeHtml(item.label || item.title || "Data")}</b><span>${escapeHtml(item.value || item.date || item.description || "")}</span></div>${item.url ? `<a class="link-btn" href="${escapeHtml(item.url)}" target="_blank" rel="noopener">Ver</a>` : ""}</div>`;
+  }
 
-      $("#intentPanel").innerHTML = `
-        <div class="intent-head">
-          <div>
-            <h2>${escapeHtml(title)}</h2>
-            <p>${escapeHtml(plan.answer)}</p>
-          </div>
-        </div>
-        <div class="search-context"><b>Sua busca:</b> ${escapeHtml(originalMessage)}</div>
-        ${officialCheck}
-        <a class="primary-cta" href="${escapeHtml(ctaUrl)}" target="_blank" rel="noopener">${escapeHtml(ctaLabel)}</a>
-      `;
-    }
+  function renderLinkItem(item) {
+    return `<div class="list-item"><div><b>${escapeHtml(item.label || item.title || item.name)}</b><span>${escapeHtml(item.description || "Página oficial relacionada à sua busca.")}</span></div>${item.url ? `<a class="link-btn" href="${escapeHtml(item.url)}" target="_blank" rel="noopener">Abrir</a>` : ""}</div>`;
+  }
 
-    function renderComponents(plan) {
-      const stack = $("#componentStack");
-      const incoming = [...new Set(plan.components || [])];
-      const preferredByIntent = {
-        conhecer_cursos: ["course_cards", "course_compare", "admission_options", "timeline", "prep_materials", "faq", "lead_form", "next_steps", "source_links", "warning"],
-        comparar_cursos: ["course_compare", "course_cards", "admission_options", "next_steps", "source_links", "lead_form", "warning"],
-        enem: ["course_cards", "admission_options", "timeline", "lead_form", "next_steps", "source_links", "faq", "warning"],
-        inscricao: ["course_cards", "timeline", "admission_options", "lead_form", "next_steps", "source_links", "faq", "warning"],
-        formas_ingresso: ["admission_options", "course_cards", "timeline", "lead_form", "next_steps", "source_links", "faq", "warning"],
-        provas_gabaritos: ["prep_materials", "course_cards", "next_steps", "source_links", "faq", "warning"],
-        agenda_editais: ["timeline", "course_cards", "admission_options", "next_steps", "source_links", "warning"],
-        resultado: ["source_links", "next_steps", "warning"],
-        evento_visita: ["timeline", "course_cards", "next_steps", "source_links", "warning"],
-        fora_escopo: ["warning", "course_cards", "next_steps", "source_links"]
-      };
-      const order = preferredByIntent[plan.intent] || ["course_cards", "course_compare", "admission_options", "timeline", "prep_materials", "lead_form", "next_steps", "source_links", "faq", "warning"];
-      const components = order.filter((name) => incoming.includes(name));
+  function renderEvents(section) {
+    const events = safeArray(section.items);
+    if (!events.length) return "";
+    const html = events.map((event) => `
+      <div class="event-row">
+        <div class="date-box">${escapeHtml(event.displayDate || event.date || "Evento")}<span>${escapeHtml(event.displayTime || "")}</span></div>
+        <div><b>${escapeHtml(event.name || event.title)}</b><div class="meta">${escapeHtml([event.city, event.state].filter(Boolean).join(" / "))}</div><p style="margin:6px 0 0;color:var(--muted)">${escapeHtml(event.description || "Conheça a experiência da graduação FGV.")}</p></div>
+        ${event.cta?.url || event.url ? `<a class="link-btn" href="${escapeHtml(event.cta?.url || event.url)}" target="_blank" rel="noopener">${escapeHtml(event.cta?.label || "Participar")}</a>` : ""}
+      </div>`).join("");
+    return sectionShell(section, html);
+  }
 
-      stack.innerHTML = components.map((component) => {
-        try {
-          if (component === "course_cards") return renderCourseCards(plan);
-          if (component === "course_compare") return renderCourseCompare(plan);
-          if (component === "admission_options") return renderAdmissionOptions(plan);
-          if (component === "timeline") return renderTimeline(plan);
-          if (component === "prep_materials") return renderPrepMaterials(plan);
-          if (component === "source_links") return renderSourceLinks(plan);
-          if (component === "faq") return renderFaq(plan);
-          if (component === "next_steps") return renderNextSteps(plan);
-          if (component === "lead_form") return renderLeadForm(plan);
-          if (component === "warning") return renderWarning(plan);
-          return "";
-        } catch (error) {
-          console.error(`Erro ao montar o componente ${component}:`, error);
-          return "";
-        }
-      }).join("");
-    }
+  function renderNextStep(section) {
+    const cta = section.cta || {};
+    const action = cta.actionType === "ask_followup" && cta.prompt
+      ? `<button class="link-btn" type="button" onclick="search('${escapeHtml(cta.prompt).replace(/'/g,"&#39;")}')">${escapeHtml(cta.label || "Continuar")}</button>`
+      : cta.url ? `<a class="link-btn" href="${escapeHtml(cta.url)}" target="_blank" rel="noopener">${escapeHtml(cta.label || "Continuar")}</a>` : "";
+    return sectionShell(section, action);
+  }
 
+  function renderLeadForm(section) {
+    const id = `lead-${Date.now()}`;
+    return sectionShell(section, `
+      <form class="lead-form" onsubmit="saveLead(event, '${id}')">
+        <input name="name" placeholder="Nome" required />
+        <input name="email" placeholder="E-mail" type="email" required />
+        <button type="submit">Enviar</button>
+      </form>
+      <div class="saved" id="${id}">Dados salvos neste protótipo.</div>`);
+  }
 
-    function renderIntentSummary() {
-      return "";
-    }
+  function renderWarning(section) {
+    return sectionShell(section, safeArray(section.items).map((item) => `<p>${escapeHtml(item.text || "")}</p>`).join(""));
+  }
 
-    function renderCourseCards(plan) {
-      const courses = matchCourses(plan.entities);
-      const city = plan.entities?.cities?.[0] || "";
-      const heading = city ? `Cursos em ${city}` : "Cursos relacionados";
-      const intro = city
-        ? `Veja as opções de graduação da FGV em ${city}. Abra o curso para conferir grade, escola responsável, formas de ingresso e prazos do processo seletivo.`
-        : "Veja cursos relacionados à sua busca. Abra o curso para conferir grade, escola responsável, formas de ingresso e prazos do processo seletivo.";
+  function renderFollowups(items) {
+    $("#followups").innerHTML = safeArray(items).map((text) => `<button class="chip" type="button">${escapeHtml(text)}</button>`).join("");
+    $("#followups").querySelectorAll(".chip").forEach((btn) => btn.addEventListener("click", () => search(btn.textContent.trim())));
+  }
 
-      return `
-        <section class="component">
-          <h3>${escapeHtml(heading)}</h3>
-          <p>${escapeHtml(intro)}</p>
-          <div class="grid">
-            ${courses.map((course) => {
-              const pills = coursePills(course);
-              return `
-              <article class="data-card">
-                <h4>${escapeHtml(course.displayName)}</h4>
-                <div class="meta">${escapeHtml(course.school)} · ${escapeHtml(course.city)} / ${escapeHtml(course.state)}</div>
-                <p>${escapeHtml(course.summary)}</p>
-                ${pills.length ? `<div class="tags">${pills.map((pill) => `<span class="tag">${escapeHtml(pill)}</span>`).join("")}</div>` : ""}
-                <a class="link-btn" style="margin-top:12px;" href="${course.url}" target="_blank" rel="noopener">Abrir curso</a>
-              </article>`;
-            }).join("")}
-          </div>
-        </section>
-      `;
-    }
+  window.saveLead = function(event, id) {
+    event.preventDefault();
+    const form = event.target;
+    const payload = Object.fromEntries(new FormData(form).entries());
+    payload.createdAt = new Date().toISOString();
+    const leads = JSON.parse(localStorage.getItem("fgv-leads") || "[]");
+    leads.push(payload);
+    localStorage.setItem("fgv-leads", JSON.stringify(leads));
+    form.reset();
+    document.getElementById(id)?.classList.add("show");
+  };
 
-
-    function renderCourseCompare(plan) {
-      let courses = matchCourses(plan.entities).slice(0, 3);
-      if (courses.length < 2) courses = DATA.courses.filter((course) => ["administracao-sp", "administracao-publica-sp", "direito-sp"].includes(course.id));
-      const fields = [
-        ["Cidade", "city"],
-        ["Escola", "school"],
-        ["Ingresso", "entry"],
-        ["Duração", "duration"],
-        ["Período", "period"],
-        ["Mensalidade", "tuition"],
-        ["Formas de ingresso", "admissions"]
-      ];
-      return `
-        <section class="component">
-          <h3>Compare os cursos</h3>
-          <p>Veja lado a lado alguns critérios que ajudam na escolha: cidade, escola, duração, período e formas de ingresso.</p>
-          <div class="table-wrap">
-            <table>
-              <tr><th>Critério</th>${courses.map((course) => `<th>${escapeHtml(course.displayName)}<br><span style="color:var(--muted);font-weight:500;">${escapeHtml(course.city)}</span></th>`).join("")}</tr>
-              ${fields.map(([label, key]) => `
-                <tr>
-                  <th>${escapeHtml(label)}</th>
-                  ${courses.map((course) => `<td>${escapeHtml(displayCourseValue(course[key]))}</td>`).join("")}
-                </tr>
-              `).join("")}
-            </table>
-          </div>
-        </section>
-      `;
-    }
-
-    function renderAdmissionOptions(plan) {
-      const requested = (plan.entities?.admissionTypes || []).map(normalize);
-      const options = requested.length
-        ? DATA.admissionTypes.filter((item) => requested.some((type) => normalize(item.label).includes(type) || type.includes(normalize(item.label))))
-        : DATA.admissionTypes;
-      const finalOptions = options.length ? options : DATA.admissionTypes;
-      return `
-        <section class="component">
-          <h3>Formas de ingresso</h3>
-          <p>Confira as modalidades disponíveis e veja as regras completas na página oficial de cada forma de ingresso.</p>
-          <div class="list">
-            ${finalOptions.map((item) => `
-              <div class="list-item">
-                <div><b>${escapeHtml(item.label)}</b><span>${escapeHtml(item.description)} ${escapeHtml(item.status || "")}</span></div>
-                <a class="link-btn" href="${item.url}" target="_blank" rel="noopener">Ver</a>
-              </div>
-            `).join("")}
-          </div>
-        </section>
-      `;
-    }
-
-    function renderTimeline(plan) {
-      const courses = matchCourses(plan.entities).filter((course) => course.admissionDates || course.examDates || course.resultDate).slice(0, 4);
-      const events = [];
-      courses.forEach((course) => {
-        Object.entries(course.admissionDates || {}).forEach(([type, date]) => events.push({ label: `${type} · ${course.displayName} (${course.city})`, date, url: course.url }));
-        if (course.examDates) events.push({ label: `Datas das provas · ${course.displayName} (${course.city})`, date: course.examDates, url: course.url });
-        if (course.resultDate) events.push({ label: `Divulgação do resultado · ${course.displayName} (${course.city})`, date: course.resultDate, url: course.url });
-      });
-      if (!events.length) {
-        events.push(
-          { label: "Agenda oficial", date: "Consultar conforme curso e ciclo", url: "https://vestibular.fgv.br/processo-seletivo" },
-          { label: "Editais e manuais", date: "Validar regra vigente", url: "https://vestibular.fgv.br/processo-seletivo" }
-        );
-      }
-      return `
-        <section class="component">
-          <h3>Prazos e datas importantes</h3>
-          <p>As datas podem variar por curso, cidade e forma de ingresso. Confirme sempre no edital oficial antes de se inscrever.</p>
-          <div class="list">
-            ${events.map((event) => `
-              <div class="list-item">
-                <div><b>${escapeHtml(event.date)}</b><span>${escapeHtml(event.label)}</span></div>
-                <a class="link-btn" href="${event.url}" target="_blank" rel="noopener">Fonte</a>
-              </div>
-            `).join("")}
-          </div>
-        </section>
-      `;
-    }
-
-    function renderPrepMaterials() {
-      const materials = DATA.materials.filter((item) => ["provas-gabaritos", "editais-manuais"].includes(item.id));
-      return `
-        <section class="component">
-          <h3>Preparação para a prova</h3>
-          <p>Use os materiais oficiais para conhecer o formato das provas, treinar com gabaritos anteriores e consultar o edital vigente.</p>
-          <div class="list">
-            ${materials.map((item) => `
-              <div class="list-item">
-                <div><b>${escapeHtml(item.label)}</b><span>${escapeHtml(item.description)}</span></div>
-                <a class="link-btn" href="${item.url}" target="_blank" rel="noopener">Acessar</a>
-              </div>
-            `).join("")}
-          </div>
-        </section>
-      `;
-    }
-
-    function renderSourceLinks(plan) {
-      const courses = matchCourses(plan.entities).slice(0, 3);
-      const sources = [
-        ...courses.map((course) => ({ label: course.displayName, url: course.url })),
-        ...DATA.materials.map((item) => ({ label: item.label, url: item.url }))
-      ];
-      const unique = [];
-      sources.forEach((source) => {
-        if (!unique.some((item) => item.url === source.url && item.label === source.label)) unique.push(source);
-      });
-      return `
-        <section class="component compact">
-          <h3>Acesse também</h3>
-          <div class="link-strip">
-            ${unique.slice(0, 5).map((source) => `<a href="${source.url}" target="_blank" rel="noopener">${escapeHtml(source.label)}</a>`).join("")}
-          </div>
-        </section>
-      `;
-    }
-
-
-    function renderFaq() {
-      const questions = [
-        ["Posso usar ENEM?", "Sim, a FGV oferece modalidade ENEM, mas edições aceitas, pontuações e etapas variam por curso e edital."],
-        ["Preciso consultar edital?", "Sim. Para prazo, taxa, documentação, vagas e regra de seleção, o edital é a fonte final."],
-        ["Onde vejo provas antigas?", "Na área Processo Seletivo, em Provas e Gabaritos, filtrando cidade e curso."]
-      ];
-      return `
-        <section class="component">
-          <h3>Dúvidas relacionadas</h3>
-          <div class="list">
-            ${questions.map(([q, a]) => `<div class="list-item"><div><b>${escapeHtml(q)}</b><span>${escapeHtml(a)}</span></div></div>`).join("")}
-          </div>
-        </section>
-      `;
-    }
-
-    function renderNextSteps(plan) {
-      const suggestions = plan.followUpSuggestions || [];
-      const next = plan.nextStep;
-      if (!next) return "";
-      let actionHtml = "";
-
-      if (next.actionType === "open_link" && next.url) {
-        actionHtml = `<a class="primary-cta" href="${escapeHtml(next.url)}" target="_blank" rel="noopener">${escapeHtml(next.actionLabel)}</a>`;
-      } else if (next.actionType === "show_form") {
-        actionHtml = `<button class="send" type="button" onclick="scrollToLeadForm()">${escapeHtml(next.actionLabel)}</button>`;
-      } else {
-        actionHtml = `<button class="send" type="button" onclick="askFollowUp('${escapeHtml(next.prompt || next.actionLabel).replaceAll("'", "\'")}')">${escapeHtml(next.actionLabel)}</button>`;
-      }
-
-      return `
-        <section class="component">
-          <h3>Próximo passo recomendado</h3>
-          <p>Continue por um dos caminhos abaixo ou siga a ação sugerida para avançar na sua decisão.</p>
-          <div class="suggestions">
-            ${suggestions.map((suggestion) => `<button class="chip" type="button" onclick="askFollowUp('${escapeHtml(suggestion).replaceAll("'", "\'")}')">${escapeHtml(suggestion)}</button>`).join("")}
-          </div>
-          <div class="next-action">
-            <b>${escapeHtml(next.title)}</b>
-            <span>${escapeHtml(next.description)}</span>
-            ${actionHtml}
-          </div>
-        </section>
-      `;
-    }
-
-    function renderLeadForm(plan) {
-      if (!plan.leadCapture?.show) return "";
-      const courses = matchCourses(plan.entities).slice(0, 8);
-      const selectedCourse = plan.leadCapture.interestCourse || plan.entities?.courses?.[0] || "";
-      const selectedCity = plan.leadCapture.interestCity || plan.entities?.cities?.[0] || "";
-      return `
-        <section class="component" id="leadFormComponent">
-          <h3>${escapeHtml(plan.leadCapture.title || "Receber aviso")}</h3>
-          <p>${escapeHtml(plan.leadCapture.description || "Deixe seus dados para receber atualização sobre esse interesse.")}</p>
-          <form class="lead-form" onsubmit="submitLeadForm(event)">
-            <label>Nome
-              <input name="name" autocomplete="name" placeholder="Nome do candidato" required>
-            </label>
-            <label>E-mail
-              <input name="email" type="email" autocomplete="email" placeholder="email@exemplo.com" required>
-            </label>
-            <label>Interesse
-              <select name="interest">
-                <option value="${escapeHtml(selectedCourse || selectedCity || INTENT_LABELS[plan.intent] || "Vestibular FGV")}">${escapeHtml(selectedCourse || selectedCity || INTENT_LABELS[plan.intent] || "Vestibular FGV")}</option>
-                ${courses.map((course) => `<option value="${escapeHtml(course.displayName + " — " + course.city)}">${escapeHtml(course.displayName)} — ${escapeHtml(course.city)}</option>`).join("")}
-              </select>
-            </label>
-            <input type="hidden" name="intent" value="${escapeHtml(plan.intent)}">
-            <input type="hidden" name="stage" value="${escapeHtml(plan.stage)}">
-            <button class="send" type="submit">Enviar interesse</button>
-            <div class="lead-success" id="leadSuccess">Interesse registrado. Você receberá novidades sobre esse curso ou forma de ingresso quando houver atualização.</div>
-            <div class="form-note">Você poderá receber comunicações sobre processos seletivos, eventos e novidades da graduação FGV. Consulte a política de privacidade no site oficial.</div>
-          </form>
-        </section>
-      `;
-    }
-
-    function renderWarning(plan) {
-      return `
-        <section class="component">
-          <h3>Não encontrei esse assunto no Vestibular FGV</h3>
-          <p>${escapeHtml(plan.answer || "Essa pergunta não parece relacionada ao Vestibular FGV. Você pode tentar buscar por cursos, formas de ingresso, inscrições, editais, provas ou resultados.")}</p>
-        </section>
-      `;
-    }
-
-    function renderFollowUps(suggestions) {
-      $("#followUps").innerHTML = suggestions.map((suggestion) =>
-        `<button class="chip" type="button" data-follow="${escapeHtml(suggestion)}">${escapeHtml(suggestion)}</button>`
-      ).join("");
-      document.querySelectorAll("#followUps .chip").forEach((chip) => {
-        chip.addEventListener("click", () => askFollowUp(chip.dataset.follow));
-      });
-    }
-
-    function scrollToLeadForm() {
-      const form = document.getElementById("leadFormComponent");
-      if (form) {
-        form.scrollIntoView({ behavior: "smooth", block: "start" });
-      } else if (LAST_PLAN) {
-        LAST_PLAN.leadCapture = { ...(LAST_PLAN.leadCapture || {}), show: true, title: "Receber aviso", description: "Deixe seus dados para receber atualização sobre esse interesse.", reason: "Ação solicitada pelo usuário.", interestCourse: LAST_PLAN.entities?.courses?.[0] || "", interestCity: LAST_PLAN.entities?.cities?.[0] || "" };
-        renderPlan(LAST_PLAN, $("#queryInput").value || "continuidade da jornada");
-      }
-    }
-
-    function submitLeadForm(event) {
-      event.preventDefault();
-      const form = event.currentTarget;
-      const payload = Object.fromEntries(new FormData(form).entries());
-      const saved = JSON.parse(localStorage.getItem("fgvGenerativeNavLeads") || "[]");
-      saved.push({ ...payload, createdAt: new Date().toISOString(), source: "prototipo-navegacao-generativa" });
-      localStorage.setItem("fgvGenerativeNavLeads", JSON.stringify(saved));
-      const success = document.getElementById("leadSuccess");
-      if (success) success.classList.add("show");
-      form.querySelector("button[type='submit']").textContent = "Interesse enviado";
-      form.querySelector("button[type='submit']").disabled = true;
-    }
-
-    function askFollowUp(text) {
-      syncQueryInputs(text);
-      runQuery(text);
-    }
-
-
-    function resetPrototype() {
-      $("#hero").style.display = "grid";
-      $("#topSearch").classList.remove("show");
-      $("#results").classList.remove("show");
-      setStatus("", false);
-      syncQueryInputs("");
-      $("#queryInput").focus();
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-
-
-    async function init() {
-      const response = await fetch("./data/vestibular-content.json");
-      DATA = await response.json();
-      renderTopNav();
-      renderSuggestions();
-      $("#footerNote").textContent = DATA.meta.disclaimer;
-      $("#queryForm").addEventListener("submit", (event) => {
-        event.preventDefault();
-        runQuery($("#queryInput").value);
-      });
-      $("#topQueryForm").addEventListener("submit", (event) => {
-        event.preventDefault();
-        runQuery($("#topQueryInput").value);
-      });
-    }
-
-    init();
-  </script>
-
-
-</body></html>
+  $("#mainBtn").addEventListener("click", () => search());
+  $("#topBtn").addEventListener("click", () => search());
+  $("#query").addEventListener("keydown", (event) => { if (event.key === "Enter") search(); });
+  $("#topQuery").addEventListener("keydown", (event) => { if (event.key === "Enter") search(); });
+  setSuggestions();
+</script>
+</body>
+</html>
