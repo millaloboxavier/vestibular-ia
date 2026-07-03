@@ -6,7 +6,7 @@ Protótipo de baixa fidelidade para testar uma experiência do Vestibular FGV em
 
 1. O candidato escreve uma pergunta.
 2. A rota server-side `/api/generate-ui` envia a pergunta + base curada do Vestibular FGV para a OpenAI.
-3. A resposta volta em JSON estruturado com intenção, entidades, etapa da jornada, componentes, próximo passo e regra de formulário.
+3. A resposta volta em JSON estruturado com intenção, entidades, componentes, próximo passo e regra de formulário.
 4. O `index.html` renderiza a experiência com cards, comparador, agenda, links oficiais, próximos passos e captura de interesse.
 
 ## Arquivos
@@ -56,6 +56,6 @@ Depois de adicionar ou alterar variáveis de ambiente, faça um novo deploy.
 ## Observações
 
 - A chave da OpenAI não fica no navegador; ela é lida apenas na função `/api/generate-ui`.
-- Se a variável de ambiente não estiver configurada ou a API falhar, o protótipo usa um fallback local simples por palavra-chave.
+- Esta versão não usa fallback local. Se a variável de ambiente não estiver configurada ou a API falhar, a interface mostra uma mensagem de erro e não renderiza uma resposta pré-programada.
 - O formulário de interesse ainda salva apenas no `localStorage` do navegador. Em uma versão pública real, ele deve ser conectado a CRM, Drupal, planilha, RD Station, Salesforce ou outro destino seguro.
 - As informações críticas de prazo, valor, edital, vagas e documentação devem sempre ser validadas nas páginas oficiais e no edital.

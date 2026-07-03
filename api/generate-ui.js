@@ -112,84 +112,6 @@ function enrichPlan(plan, message) {
   };
 }
 
-function localFallback(message) {
-  const q = normalize(message);
-  const cities = [];
-  if (q.includes("sao paulo") || q.includes("sp")) cities.push("São Paulo");
-  if (q.includes("rio") || q.includes("rj")) cities.push("Rio de Janeiro");
-  if (q.includes("brasilia") || q.includes("df")) cities.push("Brasília");
-
-  const courseHits = data.courses
-    .filter((course) => {
-      const haystack = normalize(`${course.name} ${course.displayName} ${course.school} ${course.tags.join(" ")}`);
-      return haystack.split(" ").some((token) => token.length > 3 && q.includes(token)) || q.includes(normalize(course.name));
-    })
-    .map((course) => course.displayName);
-
-  let intent = "conhecer_cursos";
-  let stage = "descoberta";
-  let components = ["intent_summary", "course_cards", "source_links", "next_steps"];
-  let answer = "Separei cursos e caminhos relacionados ao que você escreveu.";
-
-  if (q.includes("enem")) {
-    intent = "enem";
-    stage = "decisao";
-    components = ["intent_summary", "admission_options", "course_cards", "source_links", "next_steps"];
-    answer = "Você quer entender como usar o ENEM. Vou priorizar modalidades de ingresso e cursos relacionados.";
-  }
-  if (q.includes("inscri") || q.includes("prazo") || q.includes("edital") || q.includes("valor")) {
-    intent = "inscricao";
-    stage = "decisao";
-    components = ["intent_summary", "timeline", "admission_options", "course_cards", "source_links", "next_steps"];
-    answer = "Você está em uma etapa de decisão. Vou destacar prazos, formas de ingresso, edital e próximos passos.";
-  }
-  if (q.includes("compar") || q.includes("diferenca") || q.includes("diferença")) {
-    intent = "comparar_cursos";
-    stage = "consideracao";
-    components = ["intent_summary", "course_compare", "course_cards", "source_links", "next_steps"];
-    answer = "Você quer comparar opções. Montei uma visão lado a lado com os pontos mais úteis para decidir.";
-  }
-  if (q.includes("prova") || q.includes("gabarito") || q.includes("treinar") || q.includes("estudar")) {
-    intent = "provas_gabaritos";
-    stage = "preparacao";
-    components = ["intent_summary", "prep_materials", "course_cards", "source_links", "next_steps"];
-    answer = "Você está buscando preparação. Vou priorizar provas, gabaritos e materiais oficiais.";
-  }
-  if (q.includes("resultado") || q.includes("matricula") || q.includes("acompanhar")) {
-    intent = "resultado";
-    stage = "pos_inscricao";
-    components = ["intent_summary", "source_links", "next_steps"];
-    answer = "Você parece estar no pós-inscrição. Vou priorizar acompanhamento, resultados e matrícula.";
-  }
-  if (q.includes("visita") || q.includes("evento") || q.includes("conhecer a fgv") || q.includes("experiencia") || q.includes("experiência")) {
-    intent = "evento_visita";
-    stage = "descoberta";
-    components = ["intent_summary", "timeline", "source_links", "next_steps"];
-    answer = "Você quer conhecer a FGV antes de decidir. Vou destacar eventos e caminhos para explorar cursos.";
-  }
-
-  return enrichPlan({
-    intent,
-    confidence: 0.55,
-    stage,
-    entities: {
-      courses: [...new Set(courseHits)].slice(0, 4),
-      cities,
-      admissionTypes: q.includes("enem") ? ["ENEM"] : [],
-      needsOfficialCheck: true
-    },
-    answer,
-    components,
-    primaryCta: { label: "Ver página oficial", url: data.meta.officialSite },
-    followUpSuggestions: [
-      "Comparar dois cursos",
-      "Ver formas de ingresso",
-      "Encontrar provas e gabaritos",
-      "Ver cursos por cidade"
-    ]
-  }, message);
-}
-
 const UI_SCHEMA = {
   type: "object",
   additionalProperties: false,
@@ -317,7 +239,10 @@ async function handleGenerateUi(req, res) {
 
   const apiKey = process.env.OPENAI_API_KEY || process.env.api_vestibular;
   if (!apiKey) {
-    return res.status(200).json({ ...localFallback(message), debug: { mode: "local_fallback_no_api_key" } });
+    return res.status(500).json({
+      error: "OPENAI_API_KEY não configurada na Vercel.",
+      mode: "openai_unavailable"
+    });
   }
 
   const compactData = {
@@ -405,9 +330,11 @@ ${JSON.stringify(compactData)}`;
     const result = await response.json();
 
     if (!response.ok) {
-      return res.status(200).json({
-        ...localFallback(message),
-        debug: { mode: "local_fallback_openai_error", status: response.status, error: result }
+      return res.status(response.status).json({
+        error: "A chamada para a OpenAI falhou.",
+        mode: "openai_error",
+        status: response.status,
+        details: result
       });
     }
 
@@ -416,9 +343,10 @@ ${JSON.stringify(compactData)}`;
 
     return res.status(200).json({ ...enrichPlan(parsed, message), debug: { mode: "openai", model } });
   } catch (error) {
-    return res.status(200).json({
-      ...localFallback(message),
-      debug: { mode: "local_fallback_exception", error: error.message }
+    return res.status(500).json({
+      error: "Não foi possível gerar a resposta com a OpenAI.",
+      mode: "openai_exception",
+      details: error.message
     });
   }
 }

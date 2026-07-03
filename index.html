@@ -848,16 +848,24 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ message })
         });
-        if (!response.ok) throw new Error(`Erro HTTP ${response.status}`);
-        const plan = await response.json();
+
+        const plan = await response.json().catch(() => ({}));
+
+        if (!response.ok) {
+          throw new Error(plan.error || `Erro HTTP ${response.status}`);
+        }
+
+        if (plan?.debug?.mode && plan.debug.mode !== "openai") {
+          throw new Error("A resposta recebida não veio da IA.");
+        }
+
         LAST_PLAN = plan;
         renderPlan(plan, message);
         setStatus("", false);
       } catch (error) {
-        const plan = clientFallback(message);
-        LAST_PLAN = plan;
-        renderPlan(plan, message);
-        setStatus("Não consegui consultar a busca inteligente agora. Trouxe alguns caminhos úteis do Vestibular FGV para você continuar.", true);
+        console.error("Falha na busca com IA:", error);
+        LAST_PLAN = null;
+        setStatus("A busca não respondeu agora. Verifique a variável OPENAI_API_KEY na Vercel e faça um novo deploy. Nesta versão, não há resposta pré-programada.", true);
       } finally {
         $("#sendBtn").disabled = false;
         $("#topSendBtn").disabled = false;
@@ -866,70 +874,15 @@
       }
     }
 
-    function clientFallback(message) {
-      const q = normalize(message);
-      let intent = "conhecer_cursos";
-      let stage = "descoberta";
-      let components = ["intent_summary", "course_cards", "source_links", "next_steps"];
-      if (q.includes("enem")) { intent = "enem"; stage = "decisao"; components = ["intent_summary", "admission_options", "course_cards", "source_links", "next_steps"]; }
-      if (q.includes("compar") || q.includes("diferenca")) { intent = "comparar_cursos"; stage = "consideracao"; components = ["intent_summary", "course_compare", "course_cards", "source_links", "next_steps"]; }
-      if (q.includes("prova") || q.includes("gabarito") || q.includes("treinar")) { intent = "provas_gabaritos"; stage = "preparacao"; components = ["intent_summary", "prep_materials", "source_links", "next_steps"]; }
-      if (q.includes("inscri") || q.includes("edital") || q.includes("prazo")) { intent = "inscricao"; stage = "decisao"; components = ["intent_summary", "timeline", "admission_options", "source_links", "next_steps"]; }
-      const cities = [];
-      if (q.includes("sp") || q.includes("sao paulo")) cities.push("São Paulo");
-      if (q.includes("rio") || q.includes("rj")) cities.push("Rio de Janeiro");
-      if (q.includes("brasilia") || q.includes("df")) cities.push("Brasília");
-      const courses = DATA.courses.filter((course) => q.includes(normalize(course.name))).map((course) => course.displayName);
-      return {
-        intent,
-        confidence: 0.45,
-        stage,
-        entities: { courses: [...new Set(courses)], cities, admissionTypes: q.includes("enem") ? ["ENEM"] : [], needsOfficialCheck: true },
-        answer: "Encontrei alguns caminhos relacionados ao que você procura. Confira as opções abaixo e avance pela fonte oficial quando estiver pronto.",
-        components,
-        primaryCta: { label: "Ver site oficial", url: DATA.meta.officialSite },
-        followUpSuggestions: ["Comparar cursos", "Ver cursos por cidade", "Ver formas de ingresso", "Encontrar provas e gabaritos"],
-        nextStep: buildClientNextStep(intent, stage, q),
-        leadCapture: buildClientLeadCapture(intent, q, [...new Set(courses)].slice(0, 1), cities),
-        debug: { mode: "client_fallback" }
-      };
-    }
-
-    function buildClientNextStep(intent, stage, normalizedMessage = "") {
-      if (intent === "comparar_cursos") {
-        return { title: "Confira como ingressar", description: "Depois de comparar os cursos, veja quais formas de ingresso estão disponíveis para a opção que mais combina com você.", actionLabel: "Ver formas de ingresso", actionType: "ask_followup", prompt: "quais formas de ingresso posso usar?", url: "" };
-      }
-      if (intent === "provas_gabaritos") {
-        return { title: "Continue sua preparação", description: "Acesse provas anteriores, gabaritos e o edital vigente para organizar seus estudos.", actionLabel: "Ver edital e provas", actionType: "open_link", prompt: "", url: "https://vestibular.fgv.br/processo-seletivo" };
-      }
-      if (intent === "enem" || normalizedMessage.includes("em breve") || normalizedMessage.includes("fechad")) {
-        return { title: "Receba aviso sobre essa opção", description: "Deixe seu contato para acompanhar novidades sobre o curso, a cidade ou a forma de ingresso do seu interesse.", actionLabel: "Quero receber aviso", actionType: "show_form", prompt: "", url: "" };
-      }
-      if (intent === "inscricao" || stage === "decisao") {
-        return { title: "Veja o processo seletivo", description: "Confira o edital, os prazos e as orientações oficiais antes de iniciar sua inscrição.", actionLabel: "Abrir processo seletivo", actionType: "open_link", prompt: "", url: "https://vestibular.fgv.br/processo-seletivo" };
-      }
-      return { title: "Compare suas opções", description: "Você pode comparar cursos, cidades e formas de ingresso antes de decidir o próximo passo.", actionLabel: "Comparar cursos", actionType: "ask_followup", prompt: "quero comparar cursos", url: "" };
-    }
-
-    function buildClientLeadCapture(intent, normalizedMessage = "", courses = [], cities = []) {
-      const shouldShow = intent === "enem" || normalizedMessage.includes("em breve") || normalizedMessage.includes("fechad") || normalizedMessage.includes("nao abriu") || normalizedMessage.includes("avis");
-      return {
-        show: shouldShow,
-        reason: shouldShow ? "Interesse em receber atualização sobre curso, cidade ou forma de ingresso." : "",
-        title: shouldShow ? "Receber aviso quando abrir" : "Captura de interesse",
-        description: shouldShow ? "Deixe seus dados para receber novidades sobre o curso, a cidade ou a forma de ingresso do seu interesse." : "",
-        interestCourse: courses[0] || "",
-        interestCity: cities[0] || ""
-      };
-    }
-
     function completePlan(plan) {
+      if (!plan || !plan.intent || !plan.entities || !Array.isArray(plan.components) || !plan.nextStep || !plan.leadCapture) {
+        throw new Error("Resposta incompleta da IA.");
+      }
+
       const normalizedComponents = [...new Set(plan.components || [])];
       if (!normalizedComponents.includes("next_steps")) normalizedComponents.push("next_steps");
       if (plan.leadCapture?.show && !normalizedComponents.includes("lead_form")) normalizedComponents.push("lead_form");
       plan.components = normalizedComponents;
-      if (!plan.nextStep) plan.nextStep = buildClientNextStep(plan.intent, plan.stage, "");
-      if (!plan.leadCapture) plan.leadCapture = buildClientLeadCapture(plan.intent, "", plan.entities?.courses || [], plan.entities?.cities || []);
       return plan;
     }
 
@@ -1224,7 +1177,8 @@
 
     function renderNextSteps(plan) {
       const suggestions = plan.followUpSuggestions || [];
-      const next = plan.nextStep || buildClientNextStep(plan.intent, plan.stage, "");
+      const next = plan.nextStep;
+      if (!next) return "";
       let actionHtml = "";
 
       if (next.actionType === "open_link" && next.url) {
