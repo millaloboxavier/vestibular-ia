@@ -148,7 +148,7 @@
     <div class="context-card panel" id="resultHead"></div>
     <div class="thinking" id="thinking">
       <div class="thinking-title"><span class="dots">Organizando sua jornada</span></div>
-      <div class="thinking-steps"><span>interpretando a busca</span><span>identificando curso, cidade e etapa</span><span>montando os blocos certos</span></div>
+      <div class="thinking-steps"><span>entendendo o que você precisa</span><span>identificando curso, cidade e momento</span><span>organizando os próximos caminhos</span></div>
     </div>
     <div id="sections"></div>
     <div class="debug" id="debug"></div>
@@ -205,7 +205,7 @@
     $("#topSearch").classList.add("show");
     $("#results").classList.add("show");
     $("#sections").innerHTML = "";
-    $("#resultHead").innerHTML = `<div class="query">${escapeHtml(displayLabel ? "Você selecionou" : "Você buscou")}: <strong>${escapeHtml(displayLabel || $("#topQuery").value || $("#query").value)}</strong></div><h2>Estou preparando a melhor página para você.</h2><p>Vou organizar as informações mais úteis para este momento da sua jornada.</p>`;
+    $("#resultHead").innerHTML = `<div class="query">${escapeHtml(displayLabel ? "Você selecionou" : "Você perguntou")}: <strong>${escapeHtml(displayLabel || $("#topQuery").value || $("#query").value)}</strong></div><h2>Estou montando um caminho para você.</h2><p>Vou organizar as informações mais úteis para o seu momento.</p>`;
     $("#thinking").classList.add("show");
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -239,12 +239,12 @@
         body: JSON.stringify({ message })
       });
       const payload = await response.json();
-      if (!response.ok) throw new Error(payload.error || "A busca não respondeu agora.");
+      if (!response.ok) throw new Error(payload.error || "Não consegui montar essa resposta agora.");
       await renderPlan(payload, message, options);
     } catch (error) {
       console.error(error);
       $("#thinking").classList.remove("show");
-      $("#resultHead").innerHTML = `<div class="query">Sua busca: <strong>${escapeHtml(message)}</strong></div><h2>Não foi possível montar a resposta agora.</h2><p>Tente novamente em instantes.</p>`;
+      $("#resultHead").innerHTML = `<div class="query">Sua pergunta: <strong>${escapeHtml(message)}</strong></div><h2>Não foi possível montar a resposta agora.</h2><p>Tente novamente em instantes.</p>`;
       $("#sections").innerHTML = "";
       showNotice(error.message);
     } finally {
@@ -255,14 +255,14 @@
   async function renderPlan(plan, originalMessage, options = {}) {
     const displayText = options.displayLabel || originalMessage;
     $("#thinking").classList.remove("show");
-    $("#resultHead").innerHTML = `<div class="query">${escapeHtml(options.displayLabel ? "Você selecionou" : "Você buscou")}: <strong>${escapeHtml(displayText)}</strong></div><h2>${escapeHtml(plan.pageTitle || "Resultado da busca")}</h2><p id="answerText"></p>`;
+    $("#resultHead").innerHTML = `<div class="query">${escapeHtml(options.displayLabel ? "Você selecionou" : "Você perguntou")}: <strong>${escapeHtml(displayText)}</strong></div><h2>${escapeHtml(plan.pageTitle || "Caminho sugerido")}</h2><p id="answerText"></p>`;
     await typeText($("#answerText"), plan.answer || "Separei as informações mais relevantes para você continuar.", 7);
 
     const sections = safeArray(plan.sections);
     const container = $("#sections");
     container.innerHTML = "";
     if (!sections.length) {
-      container.innerHTML = `<section class="section panel reveal"><h3>Não encontrei um bloco para essa busca</h3><p class="section-intro">Tente perguntar por curso, cidade, forma de ingresso, bolsas, eventos ou datas de inscrição.</p></section>`;
+      container.innerHTML = `<section class="section panel reveal"><h3>Não encontrei um caminho para essa pergunta</h3><p class="section-intro">Tente perguntar por curso, cidade, forma de ingresso, bolsas, eventos ou datas de inscrição.</p></section>`;
     } else {
       for (const section of sections) {
         const html = renderSection(section);
@@ -373,17 +373,17 @@
   }
 
   function renderLeadForm(section) {
-    return `<section class="section panel"><h3>${escapeHtml(section.title || "Receba novidades")}</h3><p class="section-intro">${escapeHtml(section.intro || "Deixe seus dados para acompanhar novidades sobre sua busca.")}</p><form class="lead-form" data-lead-form><input name="name" placeholder="Nome" required /><input name="email" type="email" placeholder="E-mail" required /><button type="submit">Enviar</button></form><div class="saved">Pronto. Seu contato foi registrado.</div></section>`;
+    return `<section class="section panel"><h3>${escapeHtml(section.title || "Receba novidades")}</h3><p class="section-intro">${escapeHtml(section.intro || "Deixe seus dados para acompanhar novidades sobre seu interesse.")}</p><form class="lead-form" data-lead-form><input name="name" placeholder="Nome" required /><input name="email" type="email" placeholder="E-mail" required /><button type="submit">Enviar</button></form><div class="saved">Pronto. Seu contato foi registrado.</div></section>`;
   }
 
   function renderNextStep(section) {
     const items = safeArray(section.items || section.actions).filter((item) => item.label || item.text);
     if (!items.length) return "";
-    return `<section class="continue"><h3>${escapeHtml(section.title || "Continue por aqui")}</h3><p>${escapeHtml(section.intro || "Escolha um caminho para seguir.")}</p><div class="actions">${items.map((item) => `<button class="action-chip ${item.tone === "primary" ? "primary" : ""}" type="button" data-prompt="${escapeHtml(item.prompt || item.text || item.label || "")}" data-label="${escapeHtml(item.label || item.text || "Continuar")}">${escapeHtml(item.label || item.text || "Continuar")}</button>`).join("")}</div></section>`;
+    return `<section class="continue"><h3>${escapeHtml(section.title || "Quer seguir por onde agora?")}</h3><p>${escapeHtml(section.intro || "Escolha um próximo passo.")}</p><div class="actions">${items.map((item) => `<button class="action-chip ${item.tone === "primary" ? "primary" : ""}" type="button" data-prompt="${escapeHtml(item.prompt || item.text || item.label || "")}" data-label="${escapeHtml(item.label || item.text || "Continuar")}">${escapeHtml(item.label || item.text || "Continuar")}</button>`).join("")}</div></section>`;
   }
 
   function renderWarning(section) {
-    return `<section class="section panel compact"><h3>${escapeHtml(section.title || "Não encontrei esse caminho")}</h3><p class="section-intro">${escapeHtml(section.intro || "Tente buscar por cursos, formas de ingresso, bolsas, provas, eventos ou inscrição.")}</p></section>`;
+    return `<section class="section panel compact"><h3>${escapeHtml(section.title || "Não encontrei esse caminho")}</h3><p class="section-intro">${escapeHtml(section.intro || "Você pode perguntar por cursos, formas de ingresso, bolsas, provas, eventos ou inscrição.")}</p></section>`;
   }
 
   function bindTabs(root = document) {

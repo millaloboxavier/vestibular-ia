@@ -49,6 +49,12 @@ function cleanCopy(text = "") {
     [/site oficial( do Vestibular FGV)?/gi, "esta página"],
     [/site do Vestibular FGV/gi, "Vestibular FGV"],
     [/links oficiais/gi, "links úteis"],
+    [/a partir desta busca/gi, "agora"],
+    [/relacionadas? à sua busca/gi, "relacionadas ao que você procura"],
+    [/para sua busca/gi, "para este momento"],
+    [/sua busca/gi, "o que você procura"],
+    [/esta busca/gi, "este momento"],
+    [/resultado da busca/gi, "Caminho sugerido"],
     [/oficial/gi, ""],
     [/\s+\./g, "."],
     [/\s+,/g, ","],
@@ -372,9 +378,33 @@ function vestibularDetailsItems() {
 }
 
 
+function isSpecificCourseContext(message, courses = [], cityHints = []) {
+  const sig = querySignals(message);
+  const list = safeArray(courses);
+  if (!list.length) return false;
+  if (list.length === 1) return true;
+  if (sig.asksDifferentials && list.length === 1) return true;
+  return false;
+}
+
+function isBroadCourseExploration(message, courses = [], cityHints = []) {
+  const sig = querySignals(message);
+  if (!sig.asksCourse || sig.asksDate || sig.asksCompare || sig.asksDifferentials) return false;
+  return !isSpecificCourseContext(message, courses, cityHints);
+}
+
+function shouldShowCourseContextEvents(message, courses = [], cityHints = []) {
+  const sig = querySignals(message);
+  if (sig.asksEvent) return true;
+  if (cityHints.length) return true;
+  return isSpecificCourseContext(message, courses, cityHints);
+}
+
 function courseDifferentials(courses = []) {
+  const courseList = safeArray(courses);
+  if (courseList.length !== 1) return [];
   const items = [];
-  safeArray(courses).slice(0, 2).forEach((course) => {
+  courseList.forEach((course) => {
     safeArray(course.courseDifferentials).forEach((diff) => {
       items.push({
         id: diff.id,
@@ -389,7 +419,9 @@ function courseDifferentials(courses = []) {
 }
 
 function schoolRecognitions(courses = []) {
-  const schoolIds = new Set(safeArray(courses).map((course) => course.schoolId).filter(Boolean));
+  const courseList = safeArray(courses);
+  if (courseList.length !== 1) return [];
+  const schoolIds = new Set(courseList.map((course) => course.schoolId).filter(Boolean));
   const items = [];
   safeArray(data.schools).forEach((school) => {
     if (!schoolIds.has(school.id)) return;
@@ -411,36 +443,48 @@ function action(label, prompt, tone = "default") {
 function buildNextActions(message, courses = [], visibleTypes = []) {
   const sig = querySignals(message);
   const actions = [];
-  const mainCourse = courses[0];
+  const courseList = safeArray(courses);
+  const mainCourse = courseList[0];
   const visible = new Set(visibleTypes);
+  const specificCourse = courseList.length === 1;
+  const broadCourse = sig.asksCourse && !specificCourse && !sig.asksDate && !sig.asksCompare && !sig.asksDifferentials;
 
   if (sig.asksVestibularSpecific || (sig.asksDate && normalize(message).includes("vestibular"))) {
     if (!visible.has("prep_materials")) actions.push(action("Estudar com provas anteriores", "quero estudar com provas anteriores do Vestibular FGV", "primary"));
     if (!visible.has("events")) actions.push(action("Conhecer eventos da graduação", "quais eventos da graduação estão disponíveis?"));
-    actions.push(action("Ver cursos por cidade", "quais cursos a FGV oferece?"));
+    actions.push(action("Ver cursos disponíveis", "quais cursos a FGV oferece?"));
     if (!visible.has("lead_form")) actions.push(action("Receber aviso de inscrição", "quero receber aviso quando as inscrições abrirem"));
     return actions.slice(0, 4);
   }
 
   if (sig.asksDate) {
     actions.push(action("Ver cursos disponíveis", "quais cursos a FGV oferece?"));
-    actions.push(action("Ver formas de ingresso", "quais formas de ingresso posso usar?"));
+    actions.push(action("Entender formas de ingresso", "quais formas de ingresso posso usar?"));
     if (!visible.has("events")) actions.push(action("Conhecer eventos da graduação", "quais eventos da graduação estão disponíveis?"));
     if (!visible.has("lead_form")) actions.push(action("Receber aviso de inscrição", "quero receber aviso quando as inscrições abrirem", "primary"));
     return actions.slice(0, 4);
   }
 
   if (sig.asksPrep) {
-    actions.push(action("Ver datas do Vestibular FGV", "quais são as datas do Vestibular FGV?"));
+    actions.push(action("Ver datas do Vestibular FGV", "quais são as datas do Vestibular FGV?", "primary"));
     actions.push(action("Conhecer cursos", "quais cursos a FGV oferece?"));
     actions.push(action("Receber aviso de inscrição", "quero receber aviso quando as inscrições abrirem"));
     return actions.slice(0, 3);
   }
 
-  if (mainCourse && !visible.has("admission_options")) actions.push(action("Ver formas de ingresso", `quais formas de ingresso existem para ${courseName(mainCourse)} em ${mainCourse.city}?`, "primary"));
-  if (mainCourse && activeEventsForCourses([mainCourse]).length && !visible.has("events")) actions.push(action("Conhecer eventos na cidade", `quais eventos da graduação existem em ${mainCourse.city}?`));
-  if (mainCourse && !visible.has("course_differentials")) actions.push(action("Ver diferenciais do curso", `quais são os diferenciais de ${courseName(mainCourse)} em ${mainCourse.city}?`));
-  if (!sig.asksCompare) actions.push(action("Comparar cursos", "quero comparar cursos"));
+  if (broadCourse) {
+    if (normalize(message).includes("administracao")) actions.push(action("Comparar opções de Administração", "qual a diferença entre Administração de Empresas e Administração Pública?", "primary"));
+    else actions.push(action("Comparar cursos", "quero comparar cursos", "primary"));
+    actions.push(action("Entender formas de ingresso", "quais formas de ingresso posso usar?"));
+    actions.push(action("Ver bolsas de estudo", "quais bolsas de estudo a FGV oferece?"));
+    actions.push(action("Conhecer eventos da graduação", "quais eventos da graduação estão disponíveis?"));
+    return actions.slice(0, 4);
+  }
+
+  if (specificCourse && mainCourse && !visible.has("admission_options")) actions.push(action("Ver formas de ingresso", `quais formas de ingresso existem para ${courseName(mainCourse)} em ${mainCourse.city}?`, "primary"));
+  if (specificCourse && mainCourse && activeEventsForCourses([mainCourse]).length && !visible.has("events")) actions.push(action("Conhecer eventos na cidade", `quais eventos da graduação existem em ${mainCourse.city}?`));
+  if (specificCourse && mainCourse && !visible.has("course_differentials") && safeArray(mainCourse.courseDifferentials).length) actions.push(action("Ver diferenciais do curso", `quais são os diferenciais de ${courseName(mainCourse)} em ${mainCourse.city}?`));
+  if (!sig.asksCompare) actions.push(action("Comparar com outro curso", "quero comparar cursos"));
   if (!sig.asksScholarship && actions.length < 4) actions.push(action("Ver bolsas de estudo", "quais bolsas de estudo a FGV oferece?"));
   if (!actions.length) actions.push(action("Conhecer cursos", "quais cursos a FGV oferece?", "primary"));
   return Array.from(new Map(actions.map((item) => [item.label, item])).values()).slice(0, 4);
@@ -464,6 +508,8 @@ function resolveSections(plan, message) {
     selectedCourses = representativeCourses();
   }
   const selectedAdmissions = matchAdmissionTypes(message, plan.entities?.admissionTypeIds || plan.entities?.admissionTypes || []);
+  const specificCourseContext = () => isSpecificCourseContext(message, selectedCourses, cityHints);
+  const broadCourseContext = () => isBroadCourseExploration(message, selectedCourses, cityHints);
   const resolved = [];
   const addSection = (section) => {
     if (!section) return;
@@ -574,11 +620,12 @@ function resolveSections(plan, message) {
     }
 
     if (section.type === "events") {
-      let items = findByIds(allEvents(), section.eventIds);
-      if (!items.length && selectedCourses.length) items = activeEventsForCourses(selectedCourses);
+      let items = [];
+      if (sig.asksEvent) items = findByIds(allEvents(), section.eventIds);
       if (!items.length && cityHints.length) items = activeEventsByCities(cityHints);
+      if (!items.length && specificCourseContext()) items = activeEventsForCourses(selectedCourses);
       if (!items.length && sig.asksEvent) items = allEvents().filter((event) => (event.status || "active") === "active").slice(0, 5);
-      if (items.length) addSection({ ...sectionBase(section, "events", selectedCourses[0] ? `Conheça a FGV de perto em ${selectedCourses[0].city}` : "Eventos da graduação", "Veja eventos para viver a experiência universitária, conhecer cursos e tirar dúvidas antes da inscrição.", "list"), items });
+      if (items.length && shouldShowCourseContextEvents(message, selectedCourses, cityHints)) addSection({ ...sectionBase(section, "events", cityHints.length ? `Conheça a FGV de perto em ${items[0].city}` : specificCourseContext() && selectedCourses[0] ? `Conheça a FGV de perto em ${selectedCourses[0].city}` : "Eventos da graduação", "Eventos são uma forma de conhecer os cursos, conversar com a FGV e viver um pouco da experiência universitária antes de decidir.", "list"), items });
     }
 
     if (section.type === "scholarships") {
@@ -614,26 +661,36 @@ function resolveSections(plan, message) {
   });
 
   if (sig.asksCourse && selectedCourses.length && !resolved.some((section) => section.type === "course_cards") && !sig.asksDate) {
-    addSection({ type: "course_cards", title: selectedCourses.length === safeArray(data.courses).length ? "Cursos por cidade" : "Cursos relacionados", intro: selectedCourses.length === safeArray(data.courses).length ? "Navegue pelos cursos disponíveis em cada cidade." : "Encontrei estas opções a partir da sua busca.", layout: selectedCourses.length > 1 ? "tabs_by_city" : "cards", items: selectedCourses, actions: [] });
+    addSection({ type: "course_cards", title: selectedCourses.length === safeArray(data.courses).length ? "Cursos por cidade" : "Cursos relacionados", intro: selectedCourses.length === safeArray(data.courses).length ? "Explore os cursos disponíveis em cada cidade." : "Separei as opções mais próximas do que você procura.", layout: selectedCourses.length > 1 ? "tabs_by_city" : "cards", items: selectedCourses, actions: [] });
   }
 
   if ((sig.asksAdmission || sig.asksDate) && !resolved.some((section) => section.type === "admission_options") && !selectedCourses.length) {
     addSection({ type: "admission_options", title: "Formas de ingresso", intro: "Veja as modalidades e períodos informados para este processo seletivo.", layout: "cards", items: admissionItems(message, selectedCourses, selectedAdmissions.map((item) => item.id)), actions: [] });
   }
 
-  if ((sig.asksDifferentials || sig.asksCourse) && selectedCourses.length && !resolved.some((section) => section.type === "course_differentials")) {
+  if (broadCourseContext() && !resolved.some((section) => section.type === "course_compare") && normalize(message).includes("administracao")) {
+    const compareCourses = safeArray(data.courses).filter((course) => ["administracao-empresas-sp", "administracao-publica-sp", "administracao-rj", "administracao-df", "administracao-publica-df"].includes(course.id)).slice(0, 4);
+    if (compareCourses.length >= 2) addSection({ type: "course_compare", title: "Administração: entenda as diferenças", intro: "Administração de Empresas e Administração Pública têm caminhos diferentes. Compare cidade, escola, duração e formas de ingresso antes de decidir.", layout: "table", items: compareCourses, actions: [] });
+  }
+
+  if (broadCourseContext() && !resolved.some((section) => section.type === "admission_options")) {
+    addSection({ type: "admission_options", title: "Como você pode entrar", intro: "Depois de escolher um curso, vale entender quais modalidades de ingresso combinam com seu momento.", layout: "cards", items: admissionItems("formas de ingresso", [], selectedAdmissions.map((item) => item.id)).slice(0, 4), actions: [] });
+  }
+
+  if (specificCourseContext() && (sig.asksDifferentials || !broadCourseContext()) && selectedCourses.length && !resolved.some((section) => section.type === "course_differentials")) {
     const items = courseDifferentials(selectedCourses);
     if (items.length) addSection({ type: "course_differentials", title: "Diferenciais do curso", intro: selectedCourses[0]?.courseDifferentialsIntro || "Veja oportunidades e características que fazem parte da experiência do curso.", layout: "cards", items, actions: [] });
   }
 
-  if (sig.asksDifferentials && selectedCourses.length && !resolved.some((section) => section.type === "school_recognitions")) {
+  if (specificCourseContext() && sig.asksDifferentials && selectedCourses.length && !resolved.some((section) => section.type === "school_recognitions")) {
     const items = schoolRecognitions(selectedCourses);
     if (items.length) addSection({ type: "school_recognitions", title: "Reconhecimentos da escola", intro: "Diferenciais acadêmicos e institucionais ligados à escola responsável pelo curso.", layout: "cards", items, actions: [] });
   }
 
-  if ((sig.asksCourse || sig.asksEvent) && selectedCourses.length && !resolved.some((section) => section.type === "events") && !sig.asksDate) {
-    const items = activeEventsForCourses(selectedCourses);
-    if (items.length) addSection({ type: "events", title: `Conheça a FGV de perto em ${selectedCourses[0].city}`, intro: "Há eventos da graduação na cidade do curso. Pode ser uma boa forma de viver a experiência universitária antes de decidir.", layout: "list", items, actions: [] });
+  if ((sig.asksCourse || sig.asksEvent) && selectedCourses.length && !resolved.some((section) => section.type === "events") && !sig.asksDate && shouldShowCourseContextEvents(message, selectedCourses, cityHints)) {
+    let items = cityHints.length ? activeEventsByCities(cityHints) : activeEventsForCourses(selectedCourses);
+    if (!items.length && sig.asksEvent) items = allEvents().filter((event) => (event.status || "active") === "active").slice(0, 5);
+    if (items.length) addSection({ type: "events", title: cityHints.length ? `Conheça a FGV de perto em ${items[0].city}` : `Conheça a FGV de perto em ${selectedCourses[0].city}`, intro: "Eventos são uma forma de conhecer os cursos, conversar com a FGV e viver um pouco da experiência universitária antes de decidir.", layout: "list", items, actions: [] });
   }
 
   if (sig.asksScholarship && !resolved.some((section) => section.type === "scholarships")) {
@@ -667,10 +724,25 @@ function resolveSections(plan, message) {
   }
 
   if (actions.length) {
+    let nextTitle = "Quer seguir por onde agora?";
+    let nextIntro = "Posso te ajudar a avançar por alguns caminhos.";
+    if (sig.asksVestibularSpecific || sig.asksPrep) {
+      nextTitle = "Quer se preparar para o Vestibular FGV?";
+      nextIntro = "Você pode ver provas anteriores, acompanhar datas ou conhecer os cursos antes de decidir.";
+    } else if (sig.asksDate) {
+      nextTitle = "Enquanto as inscrições não abrem";
+      nextIntro = "Você pode conhecer cursos, entender as formas de ingresso ou receber um aviso sobre o período de inscrição.";
+    } else if (broadCourseContext()) {
+      nextTitle = "Quer ajuda para escolher?";
+      nextIntro = "Posso comparar opções, explicar formas de ingresso ou mostrar bolsas que podem fazer diferença na sua decisão.";
+    } else if (specificCourseContext()) {
+      nextTitle = "Quer avançar nesse curso?";
+      nextIntro = "Veja como entrar, compare com outra opção ou conheça experiências ligadas à cidade do curso.";
+    }
     addSection({
       type: "next_step",
-      title: "Continue por aqui",
-      intro: "Escolha um caminho para seguir a partir desta busca.",
+      title: nextTitle,
+      intro: nextIntro,
       layout: "chips",
       items: actions,
       actions
@@ -687,8 +759,8 @@ function rewriteForKnownData(plan, message, sections) {
   const firstPeriod = firstAdmission ? formatPeriod(firstAdmission.startDate, firstAdmission.endDate) : generalAdmissionPeriod();
   const normalized = { ...plan };
 
-  normalized.pageTitle = cleanCopy(plan.pageTitle || "Resultado da sua busca");
-  normalized.answer = cleanCopy(plan.answer || "Separei as informações mais relevantes para sua busca.");
+  normalized.pageTitle = cleanCopy(plan.pageTitle || "Caminho sugerido");
+  normalized.answer = cleanCopy(plan.answer || "Separei as informações mais úteis para você continuar.");
 
   if (sig.asksDate && firstPeriod) {
     if (sig.asksVestibularSpecific) {
@@ -698,7 +770,7 @@ function rewriteForKnownData(plan, message, sections) {
       normalized.pageTitle = q.includes("2027") || q.includes("processo seletivo")
         ? "Inscrições para o processo seletivo 2027.1"
         : "Datas de inscrição";
-      normalized.answer = `As inscrições estão previstas para ${firstPeriod}. A abertura ainda não aconteceu, mas o período já está indicado. Veja abaixo as datas e caminhos relacionados à sua busca.`;
+      normalized.answer = `As inscrições estão previstas para ${firstPeriod}. A abertura ainda não aconteceu, mas o período já está indicado. Veja abaixo as datas e caminhos relacionados ao que você procura.`;
     }
   }
 
@@ -706,7 +778,7 @@ function rewriteForKnownData(plan, message, sections) {
     const courses = matchCoursesFromText(message, plan.entities?.courseIds || plan.entities?.courses || [], plan.entities?.cities);
     if (courses.length === 1) {
       normalized.pageTitle = courseName(courses[0]);
-      normalized.answer = cleanCopy(plan.answer || `Encontrei o curso de ${courseName(courses[0])} em ${courses[0].city}. Abaixo, você vê as informações principais e caminhos para continuar.`);
+      normalized.answer = cleanCopy(plan.answer || `Encontrei o curso de ${courseName(courses[0])} em ${courses[0].city}. Abaixo, você vê as informações principais e alguns caminhos para continuar.`);
     }
   }
 
@@ -814,17 +886,41 @@ Regras obrigatórias:
 - Use somente IDs que aparecem na BASE_DO_SITE.
 - Não invente prazos, valores, vagas, regras, reconhecimentos, bolsas ou eventos.
 - Trate esta interface como o próprio site do Vestibular FGV. Nunca escreva "consulte", "acesse", "página oficial", "site oficial", "página do Vestibular", "abrir site", "ver página" nem qualquer frase que pareça mandar o usuário para outro site ou para outra página. Use "veja abaixo", "nesta página" ou apresente a informação diretamente.
+- Não escreva como mecanismo de busca. Evite "resultado da busca", "sua busca", "a partir desta busca" e linguagem de sistema. Escreva como uma conversa útil com o candidato.
 - O texto deve parecer interface final para vestibulandos: claro, humano, útil, sem mencionar IA, JSON, componente, intenção, confiança, protótipo ou sistema.
-- A resposta inicial pode explicar um pouco o caminho encontrado, mas deve ir direto ao ponto.
-- Quando a pergunta for especificamente sobre Vestibular FGV, data do vestibular, prova do vestibular ou inscrição no vestibular, trate "Vestibular FGV" como uma forma de ingresso específica. Não mostre todas as formas de ingresso nesse caso. Use timeline primeiro, depois admission_details, prep_materials e events quando houver. Se a base tiver startDate e endDate, cite o período explicitamente no answer, por exemplo "As inscrições para o Vestibular FGV estão previstas para 27/07/2026 a 16/09/2026".
-- Para pergunta ampla sobre datas, inscrição, prazo ou processo seletivo, use timeline, admission_options e, quando a pergunta for geral, course_cards. Se a base tiver startDate e endDate, cite o período explicitamente no answer.
-- Para pergunta sobre curso/cidade, comece com course_cards ou course_compare; inclua course_differentials quando houver interesse em diferenciais ou quando o curso tiver diferenciais relevantes.
-- Para pergunta sobre curso, se houver evento ativo na mesma cidade, inclua events como caminho contextual, mas com texto natural: "Conheça a FGV de perto".
-- Para pergunta sobre bolsa, inclua scholarships.
-- Para pergunta sobre preparação ou sobre Vestibular FGV, inclua prep_materials quando houver provas, gabaritos ou documentos úteis na base.
-- Use leadCapture.show=true quando a pessoa pedir aviso, quando perguntar por abertura de inscrição, ou quando o status estiver em breve.
-- Nunca termine uma renderização sem oferecer alguma continuidade útil para a pessoa. Use next_step com poucas opções contextuais, variadas e relacionadas ao que apareceu na página.
-- Se o pedido estiver fora do escopo do Vestibular FGV, use warning e ofereça caminhos de cursos, formas de ingresso, bolsas, eventos ou provas.
+- A resposta inicial deve explicar o caminho encontrado e antecipar o que a pessoa pode fazer em seguida, sem ser seca.
+
+Matriz de navegação por intenção:
+1. Se a pessoa pergunta genericamente por cursos, cursos por cidade ou por uma área ampla:
+   - Use course_cards como primeiro bloco.
+   - Se não houver cidade, organize por cidade.
+   - Não use course_differentials nem school_recognitions.
+   - Não use events, exceto se a pessoa pedir eventos ou mencionar uma cidade.
+   - Ofereça continuidade para comparar cursos, entender formas de ingresso, ver bolsas ou conhecer eventos.
+2. Se a pessoa pergunta por um curso específico com cidade clara, por exemplo "Administração de Empresas em São Paulo":
+   - Use course_cards ou course_compare se fizer sentido.
+   - Pode usar course_differentials apenas se houver exatamente um curso identificado e esse curso tiver diferenciais no JSON.
+   - Pode usar school_recognitions apenas se houver exatamente um curso identificado.
+   - Pode usar events da cidade desse curso.
+3. Se a pessoa pergunta "curso de administração" sem cidade clara:
+   - Trate como exploração ampla de opções de Administração.
+   - Mostre cursos por cidade.
+   - Compare Administração de Empresas e Administração Pública quando houver dados.
+   - Não mostre diferenciais da FGV EAESP, porque eles pertencem apenas a Administração de Empresas em São Paulo.
+4. Quando a pergunta for especificamente sobre Vestibular FGV, data do vestibular, prova do vestibular ou inscrição no vestibular:
+   - Trate "Vestibular FGV" como uma forma de ingresso específica, não como sinônimo de todas as modalidades.
+   - Não mostre todas as formas de ingresso nesse caso.
+   - Use timeline primeiro, depois admission_details, prep_materials e events quando houver.
+   - Se a base tiver startDate e endDate, cite o período explicitamente no answer.
+5. Para pergunta ampla sobre datas, inscrição, prazo ou processo seletivo:
+   - Use timeline primeiro.
+   - Depois use admission_options e course_cards quando for útil.
+   - Se a base tiver startDate e endDate, cite o período explicitamente no answer.
+6. Para pergunta sobre bolsa, inclua scholarships.
+7. Para pergunta sobre preparação, prova, gabarito ou Vestibular FGV, inclua prep_materials quando houver materiais úteis na base.
+8. Use leadCapture.show=true quando a pessoa pedir aviso, quando perguntar por abertura de inscrição, ou quando o status estiver em breve.
+9. Nunca termine uma renderização sem oferecer alguma continuidade útil para a pessoa. Use next_step com poucas opções contextuais, variadas e relacionadas ao que apareceu na página.
+10. Se o pedido estiver fora do escopo do Vestibular FGV, use warning e ofereça caminhos de cursos, formas de ingresso, bolsas, eventos ou provas.
 
 BASE_DO_SITE:
 ${JSON.stringify(dataCatalog)}`;
