@@ -1,0 +1,1363 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vestibular FGV — encontre seu caminho</title>
+  <style>
+    :root {
+      --bg: #f7f7f5;
+      --paper: #ffffff;
+      --ink: #171717;
+      --muted: #666660;
+      --line: #deded8;
+      --soft: #eeeeea;
+      --soft-2: #f4f4f0;
+      --accent: #171717;
+      --ok: #245f44;
+      --warn: #8a5b12;
+      --blueprint: #edf1ff;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+    }
+
+    a { color: inherit; }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(255,255,255,.92);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .topbar-inner {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+
+
+    .top-search {
+      display: none;
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 0 20px 14px;
+    }
+
+    .top-search.show { display: block; }
+
+    .top-search .query-box {
+      max-width: 760px;
+      margin: 0 auto;
+      background: #ffffff;
+    }
+
+    .top-search .query-input {
+      padding: 10px 12px;
+    }
+
+    .top-search .send {
+      padding: 10px 15px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 750;
+      letter-spacing: -.02em;
+    }
+
+    .mark {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--ink);
+      display: inline-block;
+    }
+
+    .nav {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .nav a, .ghost-btn {
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--muted);
+      font-size: 13px;
+      text-decoration: none;
+      padding: 8px 10px;
+      border-radius: 999px;
+      cursor: pointer;
+    }
+
+    .nav a:hover, .ghost-btn:hover {
+      border-color: var(--line);
+      color: var(--ink);
+      background: var(--soft-2);
+    }
+
+    .shell {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 34px 20px 80px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(320px, .9fr);
+      gap: 28px;
+      align-items: stretch;
+      margin-bottom: 22px;
+    }
+
+    .hero-card, .panel, .component, .aside-card {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      box-shadow: 0 1px 0 rgba(0,0,0,.02);
+    }
+
+    .hero-card {
+      padding: 34px;
+      min-height: 350px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      width: fit-content;
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin-bottom: 18px;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--ok);
+    }
+
+    h1 {
+      font-size: clamp(32px, 5vw, 58px);
+      line-height: .96;
+      letter-spacing: -.06em;
+      margin: 0 0 18px;
+      max-width: 780px;
+    }
+
+    .lead {
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 1.55;
+      max-width: 680px;
+      margin: 0 0 28px;
+    }
+
+    .query-box {
+      display: flex;
+      gap: 10px;
+      background: var(--soft-2);
+      border: 1.5px solid var(--line);
+      border-radius: 22px;
+      padding: 8px;
+      align-items: center;
+    }
+
+    .query-box:focus-within {
+      border-color: var(--ink);
+      box-shadow: 0 0 0 4px rgba(0,0,0,.04);
+    }
+
+    .query-input {
+      width: 100%;
+      border: 0;
+      background: transparent;
+      font-size: 15px;
+      outline: none;
+      padding: 12px 12px;
+      color: var(--ink);
+    }
+
+    .send {
+      border: 0;
+      background: var(--accent);
+      color: white;
+      border-radius: 16px;
+      padding: 12px 16px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .send[disabled] {
+      opacity: .55;
+      cursor: default;
+    }
+
+    .suggestions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+
+    .chip {
+      border: 1px solid var(--line);
+      background: white;
+      padding: 9px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      color: var(--muted);
+      cursor: pointer;
+    }
+
+    .chip:hover {
+      color: var(--ink);
+      border-color: #bdbdb5;
+      background: var(--soft-2);
+    }
+
+    .concept-card {
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .mini-title {
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      font-weight: 700;
+    }
+
+    .flow {
+      display: grid;
+      gap: 10px;
+    }
+
+    .flow-step {
+      display: grid;
+      grid-template-columns: 30px 1fr;
+      gap: 10px;
+      align-items: start;
+      padding: 12px;
+      background: var(--soft-2);
+      border-radius: 14px;
+      border: 1px solid var(--line);
+    }
+
+    .flow-step b:first-child {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: var(--ink);
+      color: white;
+      display: grid;
+      place-items: center;
+      font-size: 12px;
+    }
+
+    .flow-step strong {
+      display: block;
+      margin-bottom: 2px;
+      font-size: 13px;
+    }
+
+    .flow-step span {
+      display: block;
+      color: var(--muted);
+      font-size: 12.5px;
+      line-height: 1.35;
+    }
+
+    .status {
+      display: none;
+      margin: 20px 0;
+      background: #fff8e6;
+      border: 1px solid #ead9ab;
+      color: var(--warn);
+      border-radius: 16px;
+      padding: 12px 14px;
+      font-size: 13px;
+    }
+
+    .status.show { display: block; }
+
+    .results {
+      display: none;
+      grid-template-columns: minmax(0, 1fr) 300px;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .results.show { display: grid; }
+
+    .panel {
+      padding: 20px;
+      margin-bottom: 14px;
+    }
+
+    .intent-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 12px;
+    }
+
+    .intent-head h2 {
+      margin: 0 0 6px;
+      font-size: 24px;
+      letter-spacing: -.03em;
+    }
+
+    .intent-head p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.48;
+    }
+
+
+
+    .search-context {
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .search-context b {
+      color: var(--ink);
+    }
+
+    .link-strip {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    .link-strip a {
+      display: inline-flex;
+      align-items: center;
+      text-decoration: none;
+      border: 1px solid var(--line);
+      background: var(--soft-2);
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 8px 11px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .component.compact {
+      padding: 16px 18px;
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .component.compact h3 {
+      font-size: 15px;
+    }
+
+    .badge {
+      border: 1px solid var(--line);
+      background: var(--blueprint);
+      color: #26305f;
+      border-radius: 999px;
+      padding: 7px 10px;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .journey {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 6px;
+      margin-top: 16px;
+    }
+
+    .journey-step {
+      background: var(--soft-2);
+      color: var(--muted);
+      border: 1px solid var(--line);
+      padding: 9px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      text-align: center;
+    }
+
+    .journey-step.active {
+      background: var(--ink);
+      color: white;
+      border-color: var(--ink);
+    }
+
+    .component {
+      padding: 20px;
+      margin-bottom: 14px;
+    }
+
+    .component h3 {
+      margin: 0 0 10px;
+      font-size: 18px;
+      letter-spacing: -.02em;
+    }
+
+    .component p {
+      margin: 0 0 12px;
+      color: var(--muted);
+      line-height: 1.48;
+      font-size: 14px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .data-card {
+      border: 1px solid var(--line);
+      background: var(--soft-2);
+      border-radius: 16px;
+      padding: 14px;
+      min-height: 140px;
+    }
+
+    .data-card h4 {
+      margin: 0 0 4px;
+      font-size: 15px;
+    }
+
+    .data-card .meta {
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 10px;
+    }
+
+    .data-card p {
+      font-size: 13px;
+      margin-bottom: 10px;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+
+    .tag {
+      border: 1px solid var(--line);
+      background: white;
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 5px 7px;
+      font-size: 11px;
+    }
+
+    .table-wrap { overflow-x: auto; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      min-width: 620px;
+    }
+
+    th, td {
+      border: 1px solid var(--line);
+      padding: 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th { background: var(--soft-2); }
+
+    .list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .list-item {
+      border: 1px solid var(--line);
+      background: var(--soft-2);
+      border-radius: 14px;
+      padding: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .list-item b {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 3px;
+    }
+
+    .list-item span {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .link-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      border: 1px solid var(--ink);
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 8px 11px;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+      background: white;
+    }
+
+    .primary-cta {
+      display: inline-flex;
+      text-decoration: none;
+      background: var(--ink);
+      color: white;
+      border-radius: 999px;
+      padding: 11px 14px;
+      font-weight: 800;
+      font-size: 13px;
+      margin-top: 12px;
+    }
+
+    .aside {
+      position: sticky;
+      top: 74px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .aside-card {
+      padding: 18px;
+    }
+
+    .aside-card h3 {
+      margin: 0 0 10px;
+      font-size: 15px;
+    }
+
+    .next-action {
+      border: 1.5px solid var(--ink);
+      background: #fbfbf8;
+      border-radius: 18px;
+      padding: 16px;
+      margin-top: 14px;
+    }
+
+    .next-action b {
+      display: block;
+      font-size: 15px;
+      margin-bottom: 4px;
+    }
+
+    .next-action span {
+      display: block;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+      margin-bottom: 12px;
+    }
+
+    .lead-form {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .lead-form label {
+      display: grid;
+      gap: 5px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .lead-form input, .lead-form select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 11px 12px;
+      background: white;
+      color: var(--ink);
+      font: inherit;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .form-note {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+      margin-top: 8px;
+    }
+
+    .lead-success {
+      display: none;
+      background: #edf7f1;
+      border: 1px solid #bed8c8;
+      color: var(--ok);
+      border-radius: 12px;
+      padding: 10px;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .lead-success.show { display: block; }
+
+    .debug {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 11px;
+      line-height: 1.45;
+      white-space: pre-wrap;
+      color: var(--muted);
+      background: var(--soft-2);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px;
+      max-height: 220px;
+      overflow: auto;
+    }
+
+    .footer-note {
+      margin-top: 30px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+      text-align: center;
+    }
+
+    @media (max-width: 900px) {
+      .hero, .results { grid-template-columns: 1fr; }
+      .aside { position: static; }
+      .grid { grid-template-columns: 1fr; }
+      .journey { grid-template-columns: 1fr; }
+      .topbar-inner { align-items: flex-start; flex-direction: column; }
+      .top-search { padding: 0 20px 12px; }
+      .top-search .query-box { max-width: none; }
+      .nav { justify-content: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand"><span class="mark"></span><span>Vestibular FGV</span></div>
+      <nav class="nav" id="topNav"></nav>
+    </div>
+    <div class="top-search" id="topSearch">
+      <form class="query-box" id="topQueryForm">
+        <input class="query-input" id="topQueryInput" autocomplete="off" placeholder="Faça outra busca: curso, cidade, ENEM, edital, prova..." />
+        <button class="send" id="topSendBtn" type="submit">Buscar</button>
+      </form>
+    </div>
+  </header>
+
+  <main class="shell">
+    <section class="hero" id="hero">
+      <div class="hero-card">
+        <div class="eyebrow">Graduação FGV</div>
+        <h1>Encontre seu caminho no Vestibular FGV.</h1>
+        <p class="lead">Pergunte do seu jeito. Você pode buscar cursos, comparar opções, ver formas de ingresso, consultar provas anteriores ou entender o próximo passo para se inscrever.</p>
+
+        <form class="query-box" id="queryForm">
+          <input class="query-input" id="queryInput" autocomplete="off" placeholder="Ex.: posso usar minha nota do Enem para Direito em SP?" />
+          <button class="send" id="sendBtn" type="submit">Buscar</button>
+        </form>
+        <div class="suggestions" id="suggestions"></div>
+      </div>
+
+      <aside class="concept-card panel">
+        <div>
+          <div class="mini-title">Comece por onde quiser</div>
+        </div>
+        <div class="flow">
+          <div class="flow-step"><b>1</b><div><strong>Conheça os cursos</strong><span>Veja opções por cidade, área de interesse e escola.</span></div></div>
+          <div class="flow-step"><b>2</b><div><strong>Compare caminhos</strong><span>Entenda diferenças entre cursos, cidades e formatos.</span></div></div>
+          <div class="flow-step"><b>3</b><div><strong>Prepare-se</strong><span>Acesse provas anteriores, gabaritos, editais e manuais.</span></div></div>
+          <div class="flow-step"><b>4</b><div><strong>Avance na inscrição</strong><span>Confira prazos, formas de ingresso e avisos importantes.</span></div></div>
+        </div>
+      </aside>
+    </section>
+
+    <div class="status" id="status"></div>
+
+    <section class="results" id="results">
+      <div>
+        <div class="panel" id="intentPanel"></div>
+        <div id="componentStack"></div>
+      </div>
+
+      <aside class="aside">
+        <div class="aside-card">
+          <h3>Continue navegando</h3>
+          <div class="suggestions" id="followUps"></div>
+        </div>
+        <div class="aside-card">
+          <h3>Nova busca</h3>
+          <button class="ghost-btn" onclick="resetPrototype()">Fazer outra pergunta</button>
+        </div>
+      </aside>
+    </section>
+
+    <p class="footer-note" id="footerNote"></p>
+  </main>
+
+  <script>
+    const STAGE_LABELS = {
+      descoberta: "Descoberta",
+      consideracao: "Consideração",
+      decisao: "Decisão",
+      preparacao: "Preparação",
+      pos_inscricao: "Pós-inscrição",
+      indefinida: "Indefinida"
+    };
+
+    const INTENT_LABELS = {
+      conhecer_cursos: "Conhecer cursos",
+      comparar_cursos: "Comparar cursos",
+      inscricao: "Inscrição, prazo ou edital",
+      formas_ingresso: "Formas de ingresso",
+      enem: "Ingresso via ENEM",
+      provas_gabaritos: "Provas e gabaritos",
+      agenda_editais: "Agenda, editais e manuais",
+      bolsas: "Bolsas de estudo",
+      evento_visita: "Eventos e visita",
+      resultado: "Resultados e matrícula",
+      faq: "Dúvidas frequentes",
+      fora_escopo: "Fora do escopo"
+    };
+
+    let DATA = null;
+    let LAST_PLAN = null;
+
+    const $ = (selector) => document.querySelector(selector);
+
+    function escapeHtml(value = "") {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function matchCourses(entities = {}) {
+      const requestedCourses = (entities.courses || []).map(normalize);
+      const requestedCities = (entities.cities || []).map(normalize);
+      let matched = DATA.courses.filter((course) => {
+        const courseText = normalize(`${course.name} ${course.displayName} ${course.school} ${course.tags.join(" ")}`);
+        const courseOk = !requestedCourses.length || requestedCourses.some((item) => courseText.includes(item) || item.includes(normalize(course.name)));
+        const cityOk = !requestedCities.length || requestedCities.includes(normalize(course.city)) || requestedCities.includes(normalize(course.state));
+        return courseOk && cityOk;
+      });
+
+      if (!matched.length && requestedCities.length) {
+        matched = DATA.courses.filter((course) => requestedCities.includes(normalize(course.city)) || requestedCities.includes(normalize(course.state)));
+      }
+
+      if (!matched.length && requestedCourses.length) {
+        matched = DATA.courses.filter((course) => {
+          const courseText = normalize(`${course.name} ${course.displayName} ${course.school} ${course.tags.join(" ")}`);
+          return requestedCourses.some((item) => courseText.includes(item) || item.includes(normalize(course.name)));
+        });
+      }
+
+      if (!matched.length) matched = DATA.courses.slice(0, 6);
+      return matched.slice(0, 8);
+    }
+
+    function normalize(text = "") {
+      return String(text).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+    }
+
+    function renderTopNav() {
+      $("#topNav").innerHTML = DATA.globalNavigation.slice(0, 5).map((item) =>
+        `<a href="${item.url}" target="_blank" rel="noopener">${escapeHtml(item.label)}</a>`
+      ).join("");
+    }
+
+    function renderSuggestions() {
+      $("#suggestions").innerHTML = DATA.sampleQuestions.map((question) =>
+        `<button class="chip" type="button" data-question="${escapeHtml(question)}">${escapeHtml(question)}</button>`
+      ).join("");
+      document.querySelectorAll("#suggestions .chip").forEach((chip) => {
+        chip.addEventListener("click", () => {
+          $("#queryInput").value = chip.dataset.question;
+          runQuery(chip.dataset.question);
+        });
+      });
+    }
+
+    function setStatus(message, show = true) {
+      const status = $("#status");
+      status.textContent = message || "";
+      status.classList.toggle("show", Boolean(show && message));
+    }
+
+    async function runQuery(message) {
+      if (!message.trim()) return;
+      syncQueryInputs(message);
+      setStatus("Buscando as melhores opções para você...", true);
+      $("#sendBtn").disabled = true;
+      $("#topSendBtn").disabled = true;
+      $("#sendBtn").textContent = "Buscando...";
+      $("#topSendBtn").textContent = "Buscando...";
+
+      try {
+        const response = await fetch("/api/generate-ui", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message })
+        });
+        if (!response.ok) throw new Error(`Erro HTTP ${response.status}`);
+        const plan = await response.json();
+        LAST_PLAN = plan;
+        renderPlan(plan, message);
+        setStatus("", false);
+      } catch (error) {
+        const plan = clientFallback(message);
+        LAST_PLAN = plan;
+        renderPlan(plan, message);
+        setStatus("Não consegui consultar a busca inteligente agora. Trouxe alguns caminhos úteis do Vestibular FGV para você continuar.", true);
+      } finally {
+        $("#sendBtn").disabled = false;
+        $("#topSendBtn").disabled = false;
+        $("#sendBtn").textContent = "Buscar";
+        $("#topSendBtn").textContent = "Buscar";
+      }
+    }
+
+    function clientFallback(message) {
+      const q = normalize(message);
+      let intent = "conhecer_cursos";
+      let stage = "descoberta";
+      let components = ["intent_summary", "course_cards", "source_links", "next_steps"];
+      if (q.includes("enem")) { intent = "enem"; stage = "decisao"; components = ["intent_summary", "admission_options", "course_cards", "source_links", "next_steps"]; }
+      if (q.includes("compar") || q.includes("diferenca")) { intent = "comparar_cursos"; stage = "consideracao"; components = ["intent_summary", "course_compare", "course_cards", "source_links", "next_steps"]; }
+      if (q.includes("prova") || q.includes("gabarito") || q.includes("treinar")) { intent = "provas_gabaritos"; stage = "preparacao"; components = ["intent_summary", "prep_materials", "source_links", "next_steps"]; }
+      if (q.includes("inscri") || q.includes("edital") || q.includes("prazo")) { intent = "inscricao"; stage = "decisao"; components = ["intent_summary", "timeline", "admission_options", "source_links", "next_steps"]; }
+      const cities = [];
+      if (q.includes("sp") || q.includes("sao paulo")) cities.push("São Paulo");
+      if (q.includes("rio") || q.includes("rj")) cities.push("Rio de Janeiro");
+      if (q.includes("brasilia") || q.includes("df")) cities.push("Brasília");
+      const courses = DATA.courses.filter((course) => q.includes(normalize(course.name))).map((course) => course.displayName);
+      return {
+        intent,
+        confidence: 0.45,
+        stage,
+        entities: { courses: [...new Set(courses)], cities, admissionTypes: q.includes("enem") ? ["ENEM"] : [], needsOfficialCheck: true },
+        answer: "Encontrei alguns caminhos relacionados ao que você procura. Confira as opções abaixo e avance pela fonte oficial quando estiver pronto.",
+        components,
+        primaryCta: { label: "Ver site oficial", url: DATA.meta.officialSite },
+        followUpSuggestions: ["Comparar cursos", "Ver cursos por cidade", "Ver formas de ingresso", "Encontrar provas e gabaritos"],
+        nextStep: buildClientNextStep(intent, stage, q),
+        leadCapture: buildClientLeadCapture(intent, q, [...new Set(courses)].slice(0, 1), cities),
+        debug: { mode: "client_fallback" }
+      };
+    }
+
+    function buildClientNextStep(intent, stage, normalizedMessage = "") {
+      if (intent === "comparar_cursos") {
+        return { title: "Confira como ingressar", description: "Depois de comparar os cursos, veja quais formas de ingresso estão disponíveis para a opção que mais combina com você.", actionLabel: "Ver formas de ingresso", actionType: "ask_followup", prompt: "quais formas de ingresso posso usar?", url: "" };
+      }
+      if (intent === "provas_gabaritos") {
+        return { title: "Continue sua preparação", description: "Acesse provas anteriores, gabaritos e o edital vigente para organizar seus estudos.", actionLabel: "Ver edital e provas", actionType: "open_link", prompt: "", url: "https://vestibular.fgv.br/processo-seletivo" };
+      }
+      if (intent === "enem" || normalizedMessage.includes("em breve") || normalizedMessage.includes("fechad")) {
+        return { title: "Receba aviso sobre essa opção", description: "Deixe seu contato para acompanhar novidades sobre o curso, a cidade ou a forma de ingresso do seu interesse.", actionLabel: "Quero receber aviso", actionType: "show_form", prompt: "", url: "" };
+      }
+      if (intent === "inscricao" || stage === "decisao") {
+        return { title: "Veja o processo seletivo", description: "Confira o edital, os prazos e as orientações oficiais antes de iniciar sua inscrição.", actionLabel: "Abrir processo seletivo", actionType: "open_link", prompt: "", url: "https://vestibular.fgv.br/processo-seletivo" };
+      }
+      return { title: "Compare suas opções", description: "Você pode comparar cursos, cidades e formas de ingresso antes de decidir o próximo passo.", actionLabel: "Comparar cursos", actionType: "ask_followup", prompt: "quero comparar cursos", url: "" };
+    }
+
+    function buildClientLeadCapture(intent, normalizedMessage = "", courses = [], cities = []) {
+      const shouldShow = intent === "enem" || normalizedMessage.includes("em breve") || normalizedMessage.includes("fechad") || normalizedMessage.includes("nao abriu") || normalizedMessage.includes("avis");
+      return {
+        show: shouldShow,
+        reason: shouldShow ? "Interesse em receber atualização sobre curso, cidade ou forma de ingresso." : "",
+        title: shouldShow ? "Receber aviso quando abrir" : "Captura de interesse",
+        description: shouldShow ? "Deixe seus dados para receber novidades sobre o curso, a cidade ou a forma de ingresso do seu interesse." : "",
+        interestCourse: courses[0] || "",
+        interestCity: cities[0] || ""
+      };
+    }
+
+    function completePlan(plan) {
+      const normalizedComponents = [...new Set(plan.components || [])];
+      if (!normalizedComponents.includes("next_steps")) normalizedComponents.push("next_steps");
+      if (plan.leadCapture?.show && !normalizedComponents.includes("lead_form")) normalizedComponents.push("lead_form");
+      plan.components = normalizedComponents;
+      if (!plan.nextStep) plan.nextStep = buildClientNextStep(plan.intent, plan.stage, "");
+      if (!plan.leadCapture) plan.leadCapture = buildClientLeadCapture(plan.intent, "", plan.entities?.courses || [], plan.entities?.cities || []);
+      return plan;
+    }
+
+    function renderPlan(plan, originalMessage) {
+      plan = completePlan(plan);
+      syncQueryInputs(originalMessage);
+      $("#hero").style.display = "none";
+      $("#topSearch").classList.add("show");
+      $("#results").classList.add("show");
+      renderIntentPanel(plan, originalMessage);
+      renderComponents(plan);
+      renderFollowUps(plan.followUpSuggestions || []);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+
+
+    function syncQueryInputs(value = "") {
+      const text = String(value || "");
+      const main = document.getElementById("queryInput");
+      const top = document.getElementById("topQueryInput");
+      if (main) main.value = text;
+      if (top) top.value = text;
+    }
+
+    function buildResultTitle(plan) {
+      const entities = plan.entities || {};
+      const cities = entities.cities || [];
+      const courses = entities.courses || [];
+      const firstCity = cities[0] || "";
+      const firstCourse = courses[0] || "";
+
+      if (plan.intent === "conhecer_cursos" && firstCity) return `Cursos da FGV em ${firstCity}`;
+      if (plan.intent === "conhecer_cursos") return "Cursos que podem combinar com você";
+      if (plan.intent === "comparar_cursos") return courses.length >= 2 ? "Comparação entre cursos" : "Compare cursos da FGV";
+      if (plan.intent === "enem") return firstCourse ? `Ingresso via ENEM para ${firstCourse}` : "Ingresso via ENEM";
+      if (plan.intent === "inscricao" || plan.intent === "agenda_editais") return firstCourse ? `Inscrição para ${firstCourse}` : "Inscrição e processo seletivo";
+      if (plan.intent === "provas_gabaritos") return "Provas anteriores e gabaritos";
+      if (plan.intent === "formas_ingresso") return "Formas de ingresso na FGV";
+      if (plan.intent === "evento_visita") return "Conheça a experiência FGV";
+      if (plan.intent === "resultado") return "Resultados e acompanhamento";
+      if (plan.intent === "fora_escopo") return "Busque informações do Vestibular FGV";
+      return INTENT_LABELS[plan.intent] || "O que encontrei para você";
+    }
+
+    function usefulValue(value = "") {
+      const text = String(value || "").trim();
+      if (!text) return false;
+      const n = normalize(text);
+      return !n.includes("consultar pagina") && !n.includes("a confirmar") && !n.includes("indicado na pagina");
+    }
+
+
+    function displayCourseValue(value) {
+      if (Array.isArray(value)) return value.filter(usefulValue).join(", ") || "Consultar página do curso";
+      return usefulValue(value) ? String(value) : "Consultar página do curso";
+    }
+
+    function coursePills(course) {
+      return [course.duration, course.period, course.entry]
+        .filter(usefulValue)
+        .slice(0, 3);
+    }
+
+    function renderIntentPanel(plan, originalMessage) {
+      const title = buildResultTitle(plan);
+      const officialCheck = plan.entities?.needsOfficialCheck
+        ? `<p class="search-context">Antes de avançar, confira prazos e regras no edital ou na página oficial do curso.</p>`
+        : "";
+
+      const ctaUrl = plan.primaryCta?.url || DATA.meta.officialSite;
+      const ctaLabel = plan.primaryCta?.label || "Ver página oficial";
+
+      $("#intentPanel").innerHTML = `
+        <div class="intent-head">
+          <div>
+            <h2>${escapeHtml(title)}</h2>
+            <p>${escapeHtml(plan.answer)}</p>
+          </div>
+        </div>
+        <div class="search-context"><b>Sua busca:</b> ${escapeHtml(originalMessage)}</div>
+        ${officialCheck}
+        <a class="primary-cta" href="${escapeHtml(ctaUrl)}" target="_blank" rel="noopener">${escapeHtml(ctaLabel)}</a>
+      `;
+    }
+
+    function renderComponents(plan) {
+      const stack = $("#componentStack");
+      const incoming = [...new Set(plan.components || [])];
+      const preferredByIntent = {
+        conhecer_cursos: ["course_cards", "course_compare", "admission_options", "timeline", "prep_materials", "faq", "lead_form", "next_steps", "source_links", "warning"],
+        comparar_cursos: ["course_compare", "course_cards", "admission_options", "next_steps", "source_links", "lead_form", "warning"],
+        enem: ["course_cards", "admission_options", "timeline", "lead_form", "next_steps", "source_links", "faq", "warning"],
+        inscricao: ["course_cards", "timeline", "admission_options", "lead_form", "next_steps", "source_links", "faq", "warning"],
+        formas_ingresso: ["admission_options", "course_cards", "timeline", "lead_form", "next_steps", "source_links", "faq", "warning"],
+        provas_gabaritos: ["prep_materials", "course_cards", "next_steps", "source_links", "faq", "warning"],
+        agenda_editais: ["timeline", "course_cards", "admission_options", "next_steps", "source_links", "warning"],
+        resultado: ["source_links", "next_steps", "warning"],
+        evento_visita: ["timeline", "course_cards", "next_steps", "source_links", "warning"],
+        fora_escopo: ["warning", "course_cards", "next_steps", "source_links"]
+      };
+      const order = preferredByIntent[plan.intent] || ["course_cards", "course_compare", "admission_options", "timeline", "prep_materials", "lead_form", "next_steps", "source_links", "faq", "warning"];
+      const components = order.filter((name) => incoming.includes(name));
+
+      stack.innerHTML = components.map((component) => {
+        if (component === "course_cards") return renderCourseCards(plan);
+        if (component === "course_compare") return renderCourseCompare(plan);
+        if (component === "admission_options") return renderAdmissionOptions(plan);
+        if (component === "timeline") return renderTimeline(plan);
+        if (component === "prep_materials") return renderPrepMaterials(plan);
+        if (component === "source_links") return renderSourceLinks(plan);
+        if (component === "faq") return renderFaq(plan);
+        if (component === "next_steps") return renderNextSteps(plan);
+        if (component === "lead_form") return renderLeadForm(plan);
+        if (component === "warning") return renderWarning(plan);
+        return "";
+      }).join("");
+    }
+
+
+    function renderIntentSummary() {
+      return "";
+    }
+
+    function renderCourseCards(plan) {
+      const courses = matchCourses(plan.entities);
+      const city = plan.entities?.cities?.[0] || "";
+      const heading = city ? `Cursos em ${city}` : "Cursos relacionados";
+      const intro = city
+        ? `Veja as opções de graduação da FGV em ${city}. Abra o curso para conferir grade, escola responsável, formas de ingresso e prazos do processo seletivo.`
+        : "Veja cursos relacionados à sua busca. Abra o curso para conferir grade, escola responsável, formas de ingresso e prazos do processo seletivo.";
+
+      return `
+        <section class="component">
+          <h3>${escapeHtml(heading)}</h3>
+          <p>${escapeHtml(intro)}</p>
+          <div class="grid">
+            ${courses.map((course) => {
+              const pills = coursePills(course);
+              return `
+              <article class="data-card">
+                <h4>${escapeHtml(course.displayName)}</h4>
+                <div class="meta">${escapeHtml(course.school)} · ${escapeHtml(course.city)} / ${escapeHtml(course.state)}</div>
+                <p>${escapeHtml(course.summary)}</p>
+                ${pills.length ? `<div class="tags">${pills.map((pill) => `<span class="tag">${escapeHtml(pill)}</span>`).join("")}</div>` : ""}
+                <a class="link-btn" style="margin-top:12px;" href="${course.url}" target="_blank" rel="noopener">Abrir curso</a>
+              </article>`;
+            }).join("")}
+          </div>
+        </section>
+      `;
+    }
+
+
+    function renderCourseCompare(plan) {
+      let courses = matchCourses(plan.entities).slice(0, 3);
+      if (courses.length < 2) courses = DATA.courses.filter((course) => ["administracao-sp", "administracao-publica-sp", "direito-sp"].includes(course.id));
+      const fields = [
+        ["Cidade", "city"],
+        ["Escola", "school"],
+        ["Ingresso", "entry"],
+        ["Duração", "duration"],
+        ["Período", "period"],
+        ["Mensalidade", "tuition"],
+        ["Formas de ingresso", "admissions"]
+      ];
+      return `
+        <section class="component">
+          <h3>Compare os cursos</h3>
+          <p>Veja lado a lado alguns critérios que ajudam na escolha: cidade, escola, duração, período e formas de ingresso.</p>
+          <div class="table-wrap">
+            <table>
+              <tr><th>Critério</th>${courses.map((course) => `<th>${escapeHtml(course.displayName)}<br><span style="color:var(--muted);font-weight:500;">${escapeHtml(course.city)}</span></th>`).join("")}</tr>
+              ${fields.map(([label, key]) => `
+                <tr>
+                  <th>${escapeHtml(label)}</th>
+                  ${courses.map((course) => `<td>${escapeHtml(displayCourseValue(course[key]))}</td>`).join("")}
+                </tr>
+              `).join("")}
+            </table>
+          </div>
+        </section>
+      `;
+    }
+
+    function renderAdmissionOptions(plan) {
+      const requested = (plan.entities?.admissionTypes || []).map(normalize);
+      const options = requested.length
+        ? DATA.admissionTypes.filter((item) => requested.some((type) => normalize(item.label).includes(type) || type.includes(normalize(item.label))))
+        : DATA.admissionTypes;
+      const finalOptions = options.length ? options : DATA.admissionTypes;
+      return `
+        <section class="component">
+          <h3>Formas de ingresso</h3>
+          <p>Confira as modalidades disponíveis e veja as regras completas na página oficial de cada forma de ingresso.</p>
+          <div class="list">
+            ${finalOptions.map((item) => `
+              <div class="list-item">
+                <div><b>${escapeHtml(item.label)}</b><span>${escapeHtml(item.description)} ${escapeHtml(item.status || "")}</span></div>
+                <a class="link-btn" href="${item.url}" target="_blank" rel="noopener">Ver</a>
+              </div>
+            `).join("")}
+          </div>
+        </section>
+      `;
+    }
+
+    function renderTimeline(plan) {
+      const courses = matchCourses(plan.entities).filter((course) => course.admissionDates || course.examDates || course.resultDate).slice(0, 4);
+      const events = [];
+      courses.forEach((course) => {
+        Object.entries(course.admissionDates || {}).forEach(([type, date]) => events.push({ label: `${type} · ${course.displayName} (${course.city})`, date, url: course.url }));
+        if (course.examDates) events.push({ label: `Datas das provas · ${course.displayName} (${course.city})`, date: course.examDates, url: course.url });
+        if (course.resultDate) events.push({ label: `Divulgação do resultado · ${course.displayName} (${course.city})`, date: course.resultDate, url: course.url });
+      });
+      if (!events.length) {
+        events.push(
+          { label: "Agenda oficial", date: "Consultar conforme curso e ciclo", url: "https://vestibular.fgv.br/processo-seletivo" },
+          { label: "Editais e manuais", date: "Validar regra vigente", url: "https://vestibular.fgv.br/processo-seletivo" }
+        );
+      }
+      return `
+        <section class="component">
+          <h3>Prazos e datas importantes</h3>
+          <p>As datas podem variar por curso, cidade e forma de ingresso. Confirme sempre no edital oficial antes de se inscrever.</p>
+          <div class="list">
+            ${events.map((event) => `
+              <div class="list-item">
+                <div><b>${escapeHtml(event.date)}</b><span>${escapeHtml(event.label)}</span></div>
+                <a class="link-btn" href="${event.url}" target="_blank" rel="noopener">Fonte</a>
+              </div>
+            `).join("")}
+          </div>
+        </section>
+      `;
+    }
+
+    function renderPrepMaterials() {
+      const materials = DATA.materials.filter((item) => ["provas-gabaritos", "editais-manuais"].includes(item.id));
+      return `
+        <section class="component">
+          <h3>Preparação para a prova</h3>
+          <p>Use os materiais oficiais para conhecer o formato das provas, treinar com gabaritos anteriores e consultar o edital vigente.</p>
+          <div class="list">
+            ${materials.map((item) => `
+              <div class="list-item">
+                <div><b>${escapeHtml(item.label)}</b><span>${escapeHtml(item.description)}</span></div>
+                <a class="link-btn" href="${item.url}" target="_blank" rel="noopener">Acessar</a>
+              </div>
+            `).join("")}
+          </div>
+        </section>
+      `;
+    }
+
+    function renderSourceLinks(plan) {
+      const courses = matchCourses(plan.entities).slice(0, 3);
+      const sources = [
+        ...courses.map((course) => ({ label: course.displayName, url: course.url })),
+        ...DATA.materials.map((item) => ({ label: item.label, url: item.url }))
+      ];
+      const unique = [];
+      sources.forEach((source) => {
+        if (!unique.some((item) => item.url === source.url && item.label === source.label)) unique.push(source);
+      });
+      return `
+        <section class="component compact">
+          <h3>Acesse também</h3>
+          <div class="link-strip">
+            ${unique.slice(0, 5).map((source) => `<a href="${source.url}" target="_blank" rel="noopener">${escapeHtml(source.label)}</a>`).join("")}
+          </div>
+        </section>
+      `;
+    }
+
+
+    function renderFaq() {
+      const questions = [
+        ["Posso usar ENEM?", "Sim, a FGV oferece modalidade ENEM, mas edições aceitas, pontuações e etapas variam por curso e edital."],
+        ["Preciso consultar edital?", "Sim. Para prazo, taxa, documentação, vagas e regra de seleção, o edital é a fonte final."],
+        ["Onde vejo provas antigas?", "Na área Processo Seletivo, em Provas e Gabaritos, filtrando cidade e curso."]
+      ];
+      return `
+        <section class="component">
+          <h3>Dúvidas relacionadas</h3>
+          <div class="list">
+            ${questions.map(([q, a]) => `<div class="list-item"><div><b>${escapeHtml(q)}</b><span>${escapeHtml(a)}</span></div></div>`).join("")}
+          </div>
+        </section>
+      `;
+    }
+
+    function renderNextSteps(plan) {
+      const suggestions = plan.followUpSuggestions || [];
+      const next = plan.nextStep || buildClientNextStep(plan.intent, plan.stage, "");
+      let actionHtml = "";
+
+      if (next.actionType === "open_link" && next.url) {
+        actionHtml = `<a class="primary-cta" href="${escapeHtml(next.url)}" target="_blank" rel="noopener">${escapeHtml(next.actionLabel)}</a>`;
+      } else if (next.actionType === "show_form") {
+        actionHtml = `<button class="send" type="button" onclick="scrollToLeadForm()">${escapeHtml(next.actionLabel)}</button>`;
+      } else {
+        actionHtml = `<button class="send" type="button" onclick="askFollowUp('${escapeHtml(next.prompt || next.actionLabel).replaceAll("'", "\'")}')">${escapeHtml(next.actionLabel)}</button>`;
+      }
+
+      return `
+        <section class="component">
+          <h3>Próximo passo recomendado</h3>
+          <p>Continue por um dos caminhos abaixo ou siga a ação sugerida para avançar na sua decisão.</p>
+          <div class="suggestions">
+            ${suggestions.map((suggestion) => `<button class="chip" type="button" onclick="askFollowUp('${escapeHtml(suggestion).replaceAll("'", "\'")}')">${escapeHtml(suggestion)}</button>`).join("")}
+          </div>
+          <div class="next-action">
+            <b>${escapeHtml(next.title)}</b>
+            <span>${escapeHtml(next.description)}</span>
+            ${actionHtml}
+          </div>
+        </section>
+      `;
+    }
+
+    function renderLeadForm(plan) {
+      if (!plan.leadCapture?.show) return "";
+      const courses = matchCourses(plan.entities).slice(0, 8);
+      const selectedCourse = plan.leadCapture.interestCourse || plan.entities?.courses?.[0] || "";
+      const selectedCity = plan.leadCapture.interestCity || plan.entities?.cities?.[0] || "";
+      return `
+        <section class="component" id="leadFormComponent">
+          <h3>${escapeHtml(plan.leadCapture.title || "Receber aviso")}</h3>
+          <p>${escapeHtml(plan.leadCapture.description || "Deixe seus dados para receber atualização sobre esse interesse.")}</p>
+          <form class="lead-form" onsubmit="submitLeadForm(event)">
+            <label>Nome
+              <input name="name" autocomplete="name" placeholder="Nome do candidato" required>
+            </label>
+            <label>E-mail
+              <input name="email" type="email" autocomplete="email" placeholder="email@exemplo.com" required>
+            </label>
+            <label>Interesse
+              <select name="interest">
+                <option value="${escapeHtml(selectedCourse || selectedCity || INTENT_LABELS[plan.intent] || "Vestibular FGV")}">${escapeHtml(selectedCourse || selectedCity || INTENT_LABELS[plan.intent] || "Vestibular FGV")}</option>
+                ${courses.map((course) => `<option value="${escapeHtml(course.displayName + " — " + course.city)}">${escapeHtml(course.displayName)} — ${escapeHtml(course.city)}</option>`).join("")}
+              </select>
+            </label>
+            <input type="hidden" name="intent" value="${escapeHtml(plan.intent)}">
+            <input type="hidden" name="stage" value="${escapeHtml(plan.stage)}">
+            <button class="send" type="submit">Enviar interesse</button>
+            <div class="lead-success" id="leadSuccess">Interesse registrado. Você receberá novidades sobre esse curso ou forma de ingresso quando houver atualização.</div>
+            <div class="form-note">Você poderá receber comunicações sobre processos seletivos, eventos e novidades da graduação FGV. Consulte a política de privacidade no site oficial.</div>
+          </form>
+        </section>
+      `;
+    }
+
+    function renderWarning(plan) {
+      return `
+        <section class="component">
+          <h3>Não encontrei esse assunto no Vestibular FGV</h3>
+          <p>${escapeHtml(plan.answer || "Essa pergunta não parece relacionada ao Vestibular FGV. Você pode tentar buscar por cursos, formas de ingresso, inscrições, editais, provas ou resultados.")}</p>
+        </section>
+      `;
+    }
+
+    function renderFollowUps(suggestions) {
+      $("#followUps").innerHTML = suggestions.map((suggestion) =>
+        `<button class="chip" type="button" data-follow="${escapeHtml(suggestion)}">${escapeHtml(suggestion)}</button>`
+      ).join("");
+      document.querySelectorAll("#followUps .chip").forEach((chip) => {
+        chip.addEventListener("click", () => askFollowUp(chip.dataset.follow));
+      });
+    }
+
+    function scrollToLeadForm() {
+      const form = document.getElementById("leadFormComponent");
+      if (form) {
+        form.scrollIntoView({ behavior: "smooth", block: "start" });
+      } else if (LAST_PLAN) {
+        LAST_PLAN.leadCapture = { ...(LAST_PLAN.leadCapture || {}), show: true, title: "Receber aviso", description: "Deixe seus dados para receber atualização sobre esse interesse.", reason: "Ação solicitada pelo usuário.", interestCourse: LAST_PLAN.entities?.courses?.[0] || "", interestCity: LAST_PLAN.entities?.cities?.[0] || "" };
+        renderPlan(LAST_PLAN, $("#queryInput").value || "continuidade da jornada");
+      }
+    }
+
+    function submitLeadForm(event) {
+      event.preventDefault();
+      const form = event.currentTarget;
+      const payload = Object.fromEntries(new FormData(form).entries());
+      const saved = JSON.parse(localStorage.getItem("fgvGenerativeNavLeads") || "[]");
+      saved.push({ ...payload, createdAt: new Date().toISOString(), source: "prototipo-navegacao-generativa" });
+      localStorage.setItem("fgvGenerativeNavLeads", JSON.stringify(saved));
+      const success = document.getElementById("leadSuccess");
+      if (success) success.classList.add("show");
+      form.querySelector("button[type='submit']").textContent = "Interesse enviado";
+      form.querySelector("button[type='submit']").disabled = true;
+    }
+
+    function askFollowUp(text) {
+      syncQueryInputs(text);
+      runQuery(text);
+    }
+
+
+    function resetPrototype() {
+      $("#hero").style.display = "grid";
+      $("#topSearch").classList.remove("show");
+      $("#results").classList.remove("show");
+      setStatus("", false);
+      syncQueryInputs("");
+      $("#queryInput").focus();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+
+    async function init() {
+      const response = await fetch("./data/vestibular-content.json");
+      DATA = await response.json();
+      renderTopNav();
+      renderSuggestions();
+      $("#footerNote").textContent = DATA.meta.disclaimer;
+      $("#queryForm").addEventListener("submit", (event) => {
+        event.preventDefault();
+        runQuery($("#queryInput").value);
+      });
+      $("#topQueryForm").addEventListener("submit", (event) => {
+        event.preventDefault();
+        runQuery($("#topQueryInput").value);
+      });
+    }
+
+    init();
+  </script>
+</body>
+</html>
