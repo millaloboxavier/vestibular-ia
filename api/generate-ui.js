@@ -113,7 +113,16 @@ function catalog() {
     cycle: item.cycle || "",
     startDate: item.startDate || "",
     endDate: item.endDate || "",
-    period: formatPeriod(item.startDate, item.endDate)
+    period: formatPeriod(item.startDate, item.endDate),
+    shortDescription: item.shortDescription || "",
+    registrationFrequency: item.registrationFrequency || "",
+    eligibility: safeArray(item.eligibility),
+    examFormat: safeArray(item.examFormat),
+    examPhases: item.examPhases || "",
+    preparation: item.preparation || "",
+    requiredDocuments: safeArray(item.requiredDocuments),
+    locationRule: item.locationRule || "",
+    faq: safeArray(item.faq)
   }));
 
   const materials = safeArray(data.materials).map((item, index) => ({
@@ -177,6 +186,7 @@ function querySignals(message) {
     q,
     asksCourse: /(curso|graduacao|graduação|administracao|administração|direito|economia|dados|inteligencia|inteligência|comunicacao|comunicação|relacoes|relações|matematica|matemática|sociais)/.test(q),
     asksDate: /(data|prazo|quando|inscric|inscrição|inscrever|termina|abre|abertura|calendario|calendário)/.test(q),
+    asksVestibularSpecific: /(vestibular fgv|data.*vestibular|vestibular.*data|prova.*vestibular|vestibular.*prova|inscri.*vestibular|vestibular.*inscri|fazer o vestibular|quero fazer vestibular|vestibular$)/.test(q) && !/(enem|internacional|transfer|demanda social|olimpiad|modalidades|formas de ingresso|todas as formas)/.test(q),
     asksAdmission: /(vestibular|enem|ingresso|modalidade|transferencia|transferência|internacional|demanda social|olimpiada|olimpíada)/.test(q),
     asksScholarship: /(bolsa|bolsas|financiamento|merito|mérito|demanda social|restituivel|restituível)/.test(q),
     asksEvent: /(evento|visita|experiencia|experiência|imersiva|conhecer de perto|aula tematica|aula temática)/.test(q),
@@ -189,22 +199,28 @@ function querySignals(message) {
 
 function matchAdmissionTypes(message, ids = []) {
   const q = normalize(message);
-  const direct = findByIds(data.admissionTypes, ids);
+  const sig = querySignals(message);
+  const all = safeArray(data.admissionTypes);
+  const direct = findByIds(all, ids);
   if (direct.length) return direct;
-  let matches = safeArray(data.admissionTypes).filter((item) => {
-    const label = normalize(item.label || item.name || "");
-    if (q.includes("enem") && label.includes("enem")) return true;
-    if (q.includes("vestibular") && label.includes("vestibular")) return true;
-    if (q.includes("internacional") && label.includes("internacional")) return true;
-    if (q.includes("transfer") && label.includes("transfer")) return true;
-    if (q.includes("demanda") && label.includes("demanda")) return true;
-    if ((q.includes("olimpiada") || q.includes("olimpíada")) && label.includes("olimpi")) return true;
-    return false;
-  });
-  if (!matches.length && (querySignals(message).asksDate || querySignals(message).asksAdmission)) {
-    matches = safeArray(data.admissionTypes);
+
+  if (sig.asksVestibularSpecific) {
+    const item = all.find((admission) => admission.id === "vestibular-fgv");
+    return item ? [item] : [];
   }
-  return matches.slice(0, 6);
+
+  if (q.includes("enem")) return all.filter((item) => normalize(item.label || item.name || "").includes("enem"));
+  if (q.includes("internacional")) return all.filter((item) => normalize(item.label || item.name || "").includes("internacional"));
+  if (q.includes("transfer")) return all.filter((item) => normalize(item.label || item.name || "").includes("transfer"));
+  if (q.includes("demanda")) return all.filter((item) => normalize(item.label || item.name || "").includes("demanda"));
+  if (q.includes("olimpiada") || q.includes("olimpíada")) return all.filter((item) => normalize(item.label || item.name || "").includes("olimpi"));
+
+  if (sig.asksAdmission || /formas de ingresso|modalidades|opcoes de ingresso|opções de ingresso/.test(q)) return all.slice(0, 6);
+  if (sig.asksDate) {
+    const item = all.find((admission) => admission.id === "vestibular-fgv");
+    return item ? [item] : all.slice(0, 1);
+  }
+  return [];
 }
 
 function matchCoursesFromText(message, selectedIds = [], selectedCities = []) {
@@ -339,6 +355,22 @@ function generalAdmissionPeriod() {
   return formatPeriod(first.startDate, first.endDate);
 }
 
+function vestibularAdmission() {
+  return safeArray(data.admissionTypes).find((item) => item.id === "vestibular-fgv") || null;
+}
+
+function vestibularDetailsItems() {
+  const item = vestibularAdmission();
+  if (!item) return [];
+  const rows = [];
+  if (item.registrationFrequency) rows.push({ title: "Quando acontece", shortDescription: item.registrationFrequency, type: "calendário" });
+  if (safeArray(item.examFormat).length) rows.push({ title: "Como são as provas", shortDescription: safeArray(item.examFormat).join(", ") + ".", type: "prova" });
+  if (item.examPhases) rows.push({ title: "Fases do processo", shortDescription: item.examPhases, type: "etapas" });
+  if (safeArray(item.requiredDocuments).length) rows.push({ title: "O que levar no dia da prova", shortDescription: safeArray(item.requiredDocuments).join(" "), type: "documentos" });
+  if (item.locationRule) rows.push({ title: "Escolha da cidade de prova", shortDescription: item.locationRule, type: "local de prova" });
+  return rows.slice(0, 5);
+}
+
 
 function courseDifferentials(courses = []) {
   const items = [];
@@ -382,10 +414,26 @@ function buildNextActions(message, courses = [], visibleTypes = []) {
   const mainCourse = courses[0];
   const visible = new Set(visibleTypes);
 
-  if (sig.asksDate || sig.asksAdmission) {
+  if (sig.asksVestibularSpecific || (sig.asksDate && normalize(message).includes("vestibular"))) {
+    if (!visible.has("prep_materials")) actions.push(action("Estudar com provas anteriores", "quero estudar com provas anteriores do Vestibular FGV", "primary"));
+    if (!visible.has("events")) actions.push(action("Conhecer eventos da graduação", "quais eventos da graduação estão disponíveis?"));
+    actions.push(action("Ver cursos por cidade", "quais cursos a FGV oferece?"));
+    if (!visible.has("lead_form")) actions.push(action("Receber aviso de inscrição", "quero receber aviso quando as inscrições abrirem"));
+    return actions.slice(0, 4);
+  }
+
+  if (sig.asksDate) {
     actions.push(action("Ver cursos disponíveis", "quais cursos a FGV oferece?"));
-    actions.push(action("Comparar formas de ingresso", "qual a diferença entre Vestibular FGV, ENEM e processo internacional?"));
-    actions.push(action("Receber aviso de inscrição", "quero receber aviso quando as inscrições abrirem", "primary"));
+    actions.push(action("Ver formas de ingresso", "quais formas de ingresso posso usar?"));
+    if (!visible.has("events")) actions.push(action("Conhecer eventos da graduação", "quais eventos da graduação estão disponíveis?"));
+    if (!visible.has("lead_form")) actions.push(action("Receber aviso de inscrição", "quero receber aviso quando as inscrições abrirem", "primary"));
+    return actions.slice(0, 4);
+  }
+
+  if (sig.asksPrep) {
+    actions.push(action("Ver datas do Vestibular FGV", "quais são as datas do Vestibular FGV?"));
+    actions.push(action("Conhecer cursos", "quais cursos a FGV oferece?"));
+    actions.push(action("Receber aviso de inscrição", "quero receber aviso quando as inscrições abrirem"));
     return actions.slice(0, 3);
   }
 
@@ -394,6 +442,7 @@ function buildNextActions(message, courses = [], visibleTypes = []) {
   if (mainCourse && !visible.has("course_differentials")) actions.push(action("Ver diferenciais do curso", `quais são os diferenciais de ${courseName(mainCourse)} em ${mainCourse.city}?`));
   if (!sig.asksCompare) actions.push(action("Comparar cursos", "quero comparar cursos"));
   if (!sig.asksScholarship && actions.length < 4) actions.push(action("Ver bolsas de estudo", "quais bolsas de estudo a FGV oferece?"));
+  if (!actions.length) actions.push(action("Conhecer cursos", "quais cursos a FGV oferece?", "primary"));
   return Array.from(new Map(actions.map((item) => [item.label, item])).values()).slice(0, 4);
 }
 
@@ -418,7 +467,7 @@ function resolveSections(plan, message) {
   const resolved = [];
   const addSection = (section) => {
     if (!section) return;
-    if (["course_cards", "timeline", "admission_options", "events", "scholarships", "course_differentials", "school_recognitions", "course_compare", "prep_materials", "warning", "lead_form"].includes(section.type)) {
+    if (["course_cards", "timeline", "admission_options", "events", "scholarships", "course_differentials", "school_recognitions", "course_compare", "prep_materials", "admission_details", "warning", "lead_form"].includes(section.type)) {
       const already = resolved.some((item) => item.type === section.type);
       if (already && !["course_cards"].includes(section.type)) return;
     }
@@ -439,16 +488,54 @@ function resolveSections(plan, message) {
       actions: []
     });
 
-    addSection({
-      type: "admission_options",
-      title: "Formas de ingresso relacionadas",
-      intro: "Veja as modalidades previstas para o processo seletivo e escolha qual caminho combina melhor com seu perfil.",
-      layout: "cards",
-      items: admissionItems(message, selectedCourses, selectedAdmissions.map((item) => item.id)),
-      actions: []
-    });
+    if (sig.asksVestibularSpecific) {
+      const details = vestibularDetailsItems();
+      if (details.length) {
+        addSection({
+          type: "admission_details",
+          title: "Como funciona o Vestibular FGV",
+          intro: "Veja o essencial sobre a prova, a inscrição e a preparação para essa forma de ingresso.",
+          layout: "cards",
+          items: details,
+          actions: []
+        });
+      }
 
-    if (!selectedCourses.length) {
+      const prepItems = safeArray(data.materials).filter((item) => normalize(item.label || item.title).includes("prova") || normalize(item.label || item.title).includes("gabarito") || normalize(item.label || item.title).includes("edital"));
+      if (prepItems.length) {
+        addSection({
+          type: "prep_materials",
+          title: "Prepare-se para o Vestibular FGV",
+          intro: "Use provas anteriores, gabaritos e materiais do processo seletivo para organizar seus estudos.",
+          layout: "cards",
+          items: prepItems.slice(0, 4),
+          actions: []
+        });
+      }
+
+      const eventItems = allEvents().filter((event) => (event.status || "active") === "active").slice(0, 3);
+      if (eventItems.length) {
+        addSection({
+          type: "events",
+          title: "Conheça a FGV de perto",
+          intro: "Enquanto acompanha a abertura das inscrições, você pode participar de eventos da graduação e conhecer melhor os cursos.",
+          layout: "list",
+          items: eventItems,
+          actions: []
+        });
+      }
+    } else {
+      addSection({
+        type: "admission_options",
+        title: "Formas de ingresso relacionadas",
+        intro: "Veja as modalidades previstas para o processo seletivo e escolha qual caminho combina melhor com seu perfil.",
+        layout: "cards",
+        items: admissionItems(message, selectedCourses, selectedAdmissions.map((item) => item.id)),
+        actions: []
+      });
+    }
+
+    if (!selectedCourses.length && !sig.asksVestibularSpecific) {
       addSection({
         type: "course_cards",
         title: "Enquanto isso, conheça os cursos",
@@ -516,6 +603,11 @@ function resolveSections(plan, message) {
       if (items.length) addSection({ ...sectionBase(section, "prep_materials", "Prepare-se para o processo seletivo", "Encontre materiais úteis para organizar seus estudos.", "cards"), items: items.slice(0, 4) });
     }
 
+    if (section.type === "admission_details") {
+      const items = vestibularDetailsItems();
+      if (items.length) addSection({ ...sectionBase(section, "admission_details", "Como funciona o Vestibular FGV", "Veja o essencial sobre a prova, a inscrição e a preparação para essa forma de ingresso.", "cards"), items });
+    }
+
     if (section.type === "warning" && !sig.asksDate && !sig.asksCourse && !sig.asksAdmission && !sig.asksScholarship && !sig.asksEvent) {
       addSection({ ...sectionBase(section, "warning", "Não encontrei esse caminho no Vestibular FGV", "Tente buscar por cursos, formas de ingresso, bolsas, provas, eventos ou inscrição.", "single"), items: safeArray(section.textItems).map((text) => ({ text: cleanCopy(text) })) });
     }
@@ -547,6 +639,16 @@ function resolveSections(plan, message) {
   if (sig.asksScholarship && !resolved.some((section) => section.type === "scholarships")) {
     const items = safeArray(data.scholarships?.programs).slice(0, 5);
     if (items.length) addSection({ type: "scholarships", title: "Bolsas de estudo", intro: data.scholarships?.intro || "Conheça modalidades de bolsa disponíveis na graduação.", layout: "cards", items, actions: [] });
+  }
+
+  if (sig.asksVestibularSpecific && !resolved.some((section) => section.type === "admission_details")) {
+    const items = vestibularDetailsItems();
+    if (items.length) addSection({ type: "admission_details", title: "Como funciona o Vestibular FGV", intro: "Veja o essencial sobre a prova, a inscrição e a preparação para essa forma de ingresso.", layout: "cards", items, actions: [] });
+  }
+
+  if (sig.asksVestibularSpecific && !resolved.some((section) => section.type === "prep_materials")) {
+    const items = safeArray(data.materials).filter((item) => normalize(item.label || item.title).includes("prova") || normalize(item.label || item.title).includes("gabarito") || normalize(item.label || item.title).includes("edital"));
+    if (items.length) addSection({ type: "prep_materials", title: "Prepare-se para o Vestibular FGV", intro: "Use provas anteriores, gabaritos e materiais do processo seletivo para organizar seus estudos.", layout: "cards", items: items.slice(0, 4), actions: [] });
   }
 
   const visibleTypes = resolved.map((section) => section.type);
@@ -589,10 +691,15 @@ function rewriteForKnownData(plan, message, sections) {
   normalized.answer = cleanCopy(plan.answer || "Separei as informações mais relevantes para sua busca.");
 
   if (sig.asksDate && firstPeriod) {
-    normalized.pageTitle = q.includes("2027") || q.includes("processo seletivo") || q.includes("vestibular")
-      ? "Inscrições para o processo seletivo 2027.1"
-      : "Datas de inscrição";
-    normalized.answer = `As inscrições estão previstas para ${firstPeriod}. A abertura ainda não aconteceu, mas o período já está indicado para as modalidades do processo seletivo. Veja abaixo as datas, formas de ingresso e cursos para continuar sua busca.`;
+    if (sig.asksVestibularSpecific) {
+      normalized.pageTitle = "Datas do Vestibular FGV 2027.1";
+      normalized.answer = `As inscrições para o Vestibular FGV estão previstas para ${firstPeriod}. A abertura ainda não aconteceu, mas o período já está indicado. Abaixo, organizei as datas, como funciona a prova, materiais para estudar e caminhos para continuar.`;
+    } else {
+      normalized.pageTitle = q.includes("2027") || q.includes("processo seletivo")
+        ? "Inscrições para o processo seletivo 2027.1"
+        : "Datas de inscrição";
+      normalized.answer = `As inscrições estão previstas para ${firstPeriod}. A abertura ainda não aconteceu, mas o período já está indicado. Veja abaixo as datas e caminhos relacionados à sua busca.`;
+    }
   }
 
   if (sig.asksCourse && !sig.asksDate && !sig.asksCompare) {
@@ -671,7 +778,7 @@ const RESPONSE_SCHEMA = {
         additionalProperties: false,
         required: ["type", "title", "intro", "layout", "courseIds", "admissionTypeIds", "materialIds", "eventIds", "scholarshipIds", "textItems"],
         properties: {
-          type: { type: "string", enum: ["course_cards", "course_compare", "admission_options", "events", "scholarships", "course_differentials", "school_recognitions", "timeline", "prep_materials", "next_step", "lead_form", "warning"] },
+          type: { type: "string", enum: ["course_cards", "course_compare", "admission_options", "events", "scholarships", "course_differentials", "school_recognitions", "timeline", "prep_materials", "admission_details", "next_step", "lead_form", "warning"] },
           title: { type: "string" },
           intro: { type: "string" },
           layout: { type: "string", enum: ["cards", "tabs_by_city", "list", "table", "single", "form", "chips"] },
@@ -709,13 +816,14 @@ Regras obrigatórias:
 - Trate esta interface como o próprio site do Vestibular FGV. Nunca escreva "consulte", "acesse", "página oficial", "site oficial", "página do Vestibular", "abrir site", "ver página" nem qualquer frase que pareça mandar o usuário para outro site ou para outra página. Use "veja abaixo", "nesta página" ou apresente a informação diretamente.
 - O texto deve parecer interface final para vestibulandos: claro, humano, útil, sem mencionar IA, JSON, componente, intenção, confiança, protótipo ou sistema.
 - A resposta inicial pode explicar um pouco o caminho encontrado, mas deve ir direto ao ponto.
-- Para pergunta sobre datas, inscrição, prazo ou vestibular, use timeline, admission_options e, quando a pergunta for geral, course_cards. Se a base tiver startDate e endDate, cite o período explicitamente no answer, por exemplo "As inscrições estão previstas para 27/07/2026 a 16/09/2026".
+- Quando a pergunta for especificamente sobre Vestibular FGV, data do vestibular, prova do vestibular ou inscrição no vestibular, trate "Vestibular FGV" como uma forma de ingresso específica. Não mostre todas as formas de ingresso nesse caso. Use timeline primeiro, depois admission_details, prep_materials e events quando houver. Se a base tiver startDate e endDate, cite o período explicitamente no answer, por exemplo "As inscrições para o Vestibular FGV estão previstas para 27/07/2026 a 16/09/2026".
+- Para pergunta ampla sobre datas, inscrição, prazo ou processo seletivo, use timeline, admission_options e, quando a pergunta for geral, course_cards. Se a base tiver startDate e endDate, cite o período explicitamente no answer.
 - Para pergunta sobre curso/cidade, comece com course_cards ou course_compare; inclua course_differentials quando houver interesse em diferenciais ou quando o curso tiver diferenciais relevantes.
 - Para pergunta sobre curso, se houver evento ativo na mesma cidade, inclua events como caminho contextual, mas com texto natural: "Conheça a FGV de perto".
 - Para pergunta sobre bolsa, inclua scholarships.
-- Para pergunta sobre preparação, inclua prep_materials.
+- Para pergunta sobre preparação ou sobre Vestibular FGV, inclua prep_materials quando houver provas, gabaritos ou documentos úteis na base.
 - Use leadCapture.show=true quando a pessoa pedir aviso, quando perguntar por abertura de inscrição, ou quando o status estiver em breve.
-- Inclua next_step apenas quando ele trouxer continuidade útil, com tom natural e poucas opções.
+- Nunca termine uma renderização sem oferecer alguma continuidade útil para a pessoa. Use next_step com poucas opções contextuais, variadas e relacionadas ao que apareceu na página.
 - Se o pedido estiver fora do escopo do Vestibular FGV, use warning e ofereça caminhos de cursos, formas de ingresso, bolsas, eventos ou provas.
 
 BASE_DO_SITE:

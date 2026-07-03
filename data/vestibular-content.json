@@ -7,12 +7,30 @@
     "officialSite": "https://vestibular.fgv.br/"
   },
   "globalNavigation": [
-    { "label": "Cursos", "url": "https://vestibular.fgv.br/cursos" },
-    { "label": "Processo seletivo", "url": "https://vestibular.fgv.br/processo-seletivo" },
-    { "label": "Formas de ingresso", "url": "https://vestibular.fgv.br/formas-de-ingresso" },
-    { "label": "Bolsas de estudo", "url": "https://vestibular.fgv.br/bolsas-de-estudo" },
-    { "label": "Eventos", "url": "https://vestibular.fgv.br/eventos" },
-    { "label": "Perguntas frequentes", "url": "https://vestibular.fgv.br/perguntas-frequentes" }
+    {
+      "label": "Cursos",
+      "url": "https://vestibular.fgv.br/cursos"
+    },
+    {
+      "label": "Processo seletivo",
+      "url": "https://vestibular.fgv.br/processo-seletivo"
+    },
+    {
+      "label": "Formas de ingresso",
+      "url": "https://vestibular.fgv.br/formas-de-ingresso"
+    },
+    {
+      "label": "Bolsas de estudo",
+      "url": "https://vestibular.fgv.br/bolsas-de-estudo"
+    },
+    {
+      "label": "Eventos",
+      "url": "https://vestibular.fgv.br/eventos"
+    },
+    {
+      "label": "Perguntas frequentes",
+      "url": "https://vestibular.fgv.br/perguntas-frequentes"
+    }
   ],
   "journeyStages": {
     "descoberta": {
@@ -45,7 +63,102 @@
       "cycle": "2027.1",
       "startDate": "2026-07-27",
       "endDate": "2026-09-16",
-      "url": "https://vestibular.fgv.br/graduacao/formas-de-ingresso/vestibular-fgv"
+      "url": "https://vestibular.fgv.br/graduacao/formas-de-ingresso/vestibular-fgv",
+      "shortDescription": "Principal porta de entrada para os cursos de Graduação FGV, com provas presenciais e etapas que podem variar por curso e escola.",
+      "registrationFrequency": "O Vestibular FGV ocorre anualmente para todos os cursos de Graduação e semestralmente para Administração de Empresas da FGV EAESP, Comunicação Digital FGV ECMI, Administração FGV EBAPE e Economia FGV EPGE.",
+      "eligibility": [
+        "Ter concluído o Ensino Médio para efetivar matrícula como candidato regular.",
+        "Treineiros podem participar apenas para treinamento e aferição de conhecimentos, sem direito à matrícula."
+      ],
+      "examFormat": [
+        "Questões de múltipla escolha",
+        "Redação",
+        "Questões discursivas com base nos conteúdos do Ensino Médio"
+      ],
+      "examPhases": "Para alguns cursos, o processo seletivo ocorre em fase única de prova escrita. Outros cursos podem ter duas fases, com provas escritas e exame oral.",
+      "preparation": "As provas anteriores e gabaritos ajudam o candidato a entender o formato da avaliação e organizar os estudos.",
+      "requiredDocuments": [
+        "Documento oficial com foto recente, como RG, CNH, passaporte ou carteira funcional.",
+        "Cartão de Confirmação de Inscrição da Primeira Fase, com data, horário e local de prova."
+      ],
+      "notAcceptedDocuments": [
+        "CPF sem foto",
+        "Carteira de estudante",
+        "Cópia/xerox de documento"
+      ],
+      "examLocations": [
+        {
+          "region": "Centro-Oeste",
+          "cities": [
+            "Brasília (DF)",
+            "Goiânia (GO)",
+            "Campo Grande (MS)",
+            "Cuiabá (MT)"
+          ]
+        },
+        {
+          "region": "Norte",
+          "cities": [
+            "Manaus (AM)"
+          ]
+        },
+        {
+          "region": "Nordeste",
+          "cities": [
+            "Maceió (AL)",
+            "Salvador (BA)",
+            "Fortaleza (CE)",
+            "São Luís (MA)",
+            "João Pessoa (PB)",
+            "Recife (PE)",
+            "Natal (RN)"
+          ]
+        },
+        {
+          "region": "Sudeste",
+          "cities": [
+            "Rio de Janeiro (RJ)",
+            "São Paulo (SP)",
+            "Vitória (ES)",
+            "Belo Horizonte (MG)",
+            "Divinópolis (MG)",
+            "Uberlândia (MG)",
+            "Viçosa (MG)",
+            "Campinas (SP)",
+            "Ribeirão Preto (SP)",
+            "São José dos Campos (SP)"
+          ]
+        },
+        {
+          "region": "Sul",
+          "cities": [
+            "Curitiba (PR)",
+            "Londrina (PR)",
+            "Cascavel (PR)",
+            "Porto Alegre (RS)",
+            "Joinville (SC)"
+          ]
+        }
+      ],
+      "locationRule": "No momento da inscrição, o candidato escolhe três cidades em ordem de preferência para realizar a prova. Uma delas deve ser, obrigatoriamente, a cidade onde o curso escolhido é oferecido: São Paulo, Rio de Janeiro ou Brasília.",
+      "faq": [
+        {
+          "question": "O Vestibular FGV é presencial?",
+          "answer": "Sim. As provas do Vestibular FGV são presenciais e acontecem em cidades indicadas no processo seletivo."
+        },
+        {
+          "question": "Onde vejo o conteúdo programático?",
+          "answer": "O conteúdo programático acompanha os documentos do processo seletivo e reúne matérias, tópicos e bibliografia recomendada."
+        },
+        {
+          "question": "Posso usar celular, relógio ou calculadora?",
+          "answer": "Não. Aparelhos eletrônicos, calculadoras, celulares, relógios e materiais não permitidos não podem ser usados durante a prova."
+        },
+        {
+          "question": "Posso alterar a cidade de prova?",
+          "answer": "A alteração da cidade de realização da prova só é permitida dentro do período de inscrição."
+        }
+      ]
     },
     {
       "id": "enem",
@@ -96,51 +209,47 @@
       "startDate": "2026-07-27",
       "endDate": "2026-09-16",
       "url": "https://vestibular.fgv.br/graduacao/formas-de-ingresso/transferencia-externa-eou-portadores-de-diploma"
-
     }
   ],
-
-"schools": [
-  {
-    "id": "eaesp",
-    "name": "FGV EAESP",
-    "fullName": "Escola de Administração de Empresas de São Paulo",
-    "city": "São Paulo",
-    "state": "SP",
-    "summary": "Escola da FGV dedicada à formação em administração, negócios, gestão pública e áreas relacionadas.",
-    "url": "https://eaesp.fgv.br/",
-
-    "recognitionsTitle": "Reconhecimentos da FGV EAESP",
-    "recognitionsIntro": "A FGV EAESP reúne reconhecimentos nacionais e internacionais que reforçam sua excelência acadêmica, conexão global e qualidade institucional.",
-
-    "recognitions": [
-      {
-        "id": "internacionalizacao",
-        "title": "Escola mais internacionalizada da América Latina",
-        "description": "Parceria com mais de 120 instituições estrangeiras de renome internacional, em 44 países.",
-        "type": "internacionalização"
-      },
-      {
-        "id": "tripla-acreditacao",
-        "title": "Tripla Acreditação Internacional",
-        "description": "Primeira do Brasil e uma das poucas escolas de negócios do mundo a possuir tripla acreditação internacional: AACSB, EFMD e AMBA.",
-        "type": "acreditação internacional"
-      },
-      {
-        "id": "enade",
-        "title": "ENADE",
-        "description": "Nota máxima na última avaliação do Exame Nacional de Desempenho de Estudantes.",
-        "type": "avaliação MEC"
-      },
-      {
-        "id": "igc-mec",
-        "title": "IGC/MEC",
-        "description": "Nota máxima na última avaliação do Índice Geral de Cursos do Ministério da Educação.",
-        "type": "avaliação MEC"
-      }
-    ]
-  }
-],
+  "schools": [
+    {
+      "id": "eaesp",
+      "name": "FGV EAESP",
+      "fullName": "Escola de Administração de Empresas de São Paulo",
+      "city": "São Paulo",
+      "state": "SP",
+      "summary": "Escola da FGV dedicada à formação em administração, negócios, gestão pública e áreas relacionadas.",
+      "url": "https://eaesp.fgv.br/",
+      "recognitionsTitle": "Reconhecimentos da FGV EAESP",
+      "recognitionsIntro": "A FGV EAESP reúne reconhecimentos nacionais e internacionais que reforçam sua excelência acadêmica, conexão global e qualidade institucional.",
+      "recognitions": [
+        {
+          "id": "internacionalizacao",
+          "title": "Escola mais internacionalizada da América Latina",
+          "description": "Parceria com mais de 120 instituições estrangeiras de renome internacional, em 44 países.",
+          "type": "internacionalização"
+        },
+        {
+          "id": "tripla-acreditacao",
+          "title": "Tripla Acreditação Internacional",
+          "description": "Primeira do Brasil e uma das poucas escolas de negócios do mundo a possuir tripla acreditação internacional: AACSB, EFMD e AMBA.",
+          "type": "acreditação internacional"
+        },
+        {
+          "id": "enade",
+          "title": "ENADE",
+          "description": "Nota máxima na última avaliação do Exame Nacional de Desempenho de Estudantes.",
+          "type": "avaliação MEC"
+        },
+        {
+          "id": "igc-mec",
+          "title": "IGC/MEC",
+          "description": "Nota máxima na última avaliação do Índice Geral de Cursos do Ministério da Educação.",
+          "type": "avaliação MEC"
+        }
+      ]
+    }
+  ],
   "courses": [
     {
       "id": "administracao-empresas-sp",
@@ -155,81 +264,124 @@
       "period": "Integral do 1º ao 5º semestre; parcial do 6º ao 8º.",
       "tuition": "R$ 7.850,00/mês durante 4 anos (*2026.1)",
       "campus": "Campus FGV EAESP — Av. 9 de Julho, 2029, Bela Vista, São Paulo, SP",
-      "admissions": ["Vestibular FGV", "ENEM", "Exames Internacionais", "Vestibular por Demanda Social e Diversidade"],
+      "admissions": [
+        "Vestibular FGV",
+        "ENEM",
+        "Exames Internacionais",
+        "Vestibular por Demanda Social e Diversidade"
+      ],
       "candidatePerSeat": "10,4.",
       "summary": "A graduação em Administração de Empresas da FGV EAESP é voltada a estudantes que querem alçar grandes voos e impactar o mundo positivamente. O aluno encontrará recursos e ferramentas para assumir uma posição de protagonista na transformação não só de empresas, mas da sociedade e da economia como um todo.",
-       "courseDifferentialsTitle": "Diferenciais do curso",
-         "courseDifferentialsIntro": "A graduação em Administração de Empresas da FGV EAESP combina formação internacional, conexão com o mercado, oportunidades de dupla formação e excelência acadêmica.",
-        "courseDifferentials": [ {
-            "id": "duplo-diploma",
-            "title": "Duplo diploma internacional",
-            "shortDescription": "Alunos aprovados em processo seletivo interno podem cursar parte da graduação em instituições parceiras no exterior e obter diploma da FGV EAESP e da universidade estrangeira.",
-            "type": "internacionalização",
-            "tags": ["intercâmbio", "duplo diploma", "internacional", "exterior"]
-          },
-          {
-            "id": "dupla-graduacao",
-            "title": "Dupla graduação",
-            "shortDescription": "Alunos aprovados em processo seletivo interno podem obter formação em duas áreas, combinando Administração com cursos como Direito, Economia ou Accounting, Finance & Analytics.",
-            "type": "formação complementar",
-            "tags": ["dupla graduação", "direito", "economia", "afa", "segunda graduação"],
-            "details": {
-              "partnerSchools": [
-                "FGV Direito SP"
-              ],
-        "benefit": "Permite conquistar dois diplomas em menos tempo e com custo mais acessível do que cursar duas graduações separadamente."
-      }
+      "courseDifferentialsTitle": "Diferenciais do curso",
+      "courseDifferentialsIntro": "A graduação em Administração de Empresas da FGV EAESP combina formação internacional, conexão com o mercado, oportunidades de dupla formação e excelência acadêmica.",
+      "courseDifferentials": [
+        {
+          "id": "duplo-diploma",
+          "title": "Duplo diploma internacional",
+          "shortDescription": "Alunos aprovados em processo seletivo interno podem cursar parte da graduação em instituições parceiras no exterior e obter diploma da FGV EAESP e da universidade estrangeira.",
+          "type": "internacionalização",
+          "tags": [
+            "intercâmbio",
+            "duplo diploma",
+            "internacional",
+            "exterior"
+          ]
+        },
+        {
+          "id": "dupla-graduacao",
+          "title": "Dupla graduação",
+          "shortDescription": "Alunos aprovados em processo seletivo interno podem obter formação em duas áreas, combinando Administração com cursos como Direito, Economia ou Accounting, Finance & Analytics.",
+          "type": "formação complementar",
+          "tags": [
+            "dupla graduação",
+            "direito",
+            "economia",
+            "afa",
+            "segunda graduação"
+          ],
+          "details": {
+            "partnerSchools": [
+              "FGV Direito SP"
+            ],
+            "benefit": "Permite conquistar dois diplomas em menos tempo e com custo mais acessível do que cursar duas graduações separadamente."
+          }
+        },
+        {
+          "id": "centro-de-carreiras",
+          "title": "Centro de Carreiras",
+          "shortDescription": "Área dedicada à orientação profissional dos alunos e ex-alunos, com apoio em desenvolvimento de carreira, divulgação de oportunidades e eventos.",
+          "type": "carreira",
+          "tags": [
+            "carreira",
+            "emprego",
+            "estágio",
+            "orientação profissional",
+            "mercado"
+          ]
+        },
+        {
+          "id": "entidades-estudantis",
+          "title": "Entidades estudantis",
+          "shortDescription": "Oportunidades extracurriculares para desenvolver habilidades pessoais e profissionais em projetos liderados por estudantes.",
+          "type": "experiência estudantil",
+          "tags": [
+            "vida universitária",
+            "entidades",
+            "projetos",
+            "liderança",
+            "extracurricular"
+          ]
+        },
+        {
+          "id": "graduacao-em-ingles",
+          "title": "Graduação em inglês",
+          "shortDescription": "Possibilidade de cursar a graduação em inglês, com disciplinas obrigatórias e parte das eletivas ministradas nesse idioma.",
+          "type": "internacionalização",
+          "tags": [
+            "inglês",
+            "curso em inglês",
+            "mercado internacional",
+            "graduação diurna"
+          ],
+          "details": {
+            "availability": "Disponível apenas para alunos da graduação diurna.",
+            "benefits": [
+              "Domínio de termos técnicos em inglês",
+              "Preparação para o mercado internacional",
+              "Formação internacional no Brasil, com investimento em moeda local"
+            ]
+          }
+        },
+        {
+          "id": "excelencia-academica",
+          "title": "Excelência acadêmica",
+          "shortDescription": "Conteúdo atualizado, metodologias inovadoras e corpo docente altamente qualificado, com professores brasileiros e estrangeiros formados em escolas de referência.",
+          "type": "qualidade acadêmica",
+          "tags": [
+            "excelência",
+            "professores",
+            "metodologia",
+            "qualidade acadêmica"
+          ]
+        },
+        {
+          "id": "pesquisa-e-conhecimento",
+          "title": "Pesquisa e conhecimento",
+          "shortDescription": "A escola conta com centros de estudos que conectam pesquisa aplicada e prática, produzindo conhecimento em diferentes áreas de gestão e negócios.",
+          "type": "pesquisa",
+          "tags": [
+            "pesquisa",
+            "centros de estudo",
+            "conhecimento",
+            "produção acadêmica"
+          ],
+          "details": {
+            "studyCenters": "20 centros de estudos",
+            "researchLines": "10 linhas de pesquisa"
+          }
+        }
+      ]
     },
-    {
-      "id": "centro-de-carreiras",
-      "title": "Centro de Carreiras",
-      "shortDescription": "Área dedicada à orientação profissional dos alunos e ex-alunos, com apoio em desenvolvimento de carreira, divulgação de oportunidades e eventos.",
-      "type": "carreira",
-      "tags": ["carreira", "emprego", "estágio", "orientação profissional", "mercado"]
-    },
-    {
-      "id": "entidades-estudantis",
-      "title": "Entidades estudantis",
-      "shortDescription": "Oportunidades extracurriculares para desenvolver habilidades pessoais e profissionais em projetos liderados por estudantes.",
-      "type": "experiência estudantil",
-      "tags": ["vida universitária", "entidades", "projetos", "liderança", "extracurricular"]
-    },
-    {
-      "id": "graduacao-em-ingles",
-      "title": "Graduação em inglês",
-      "shortDescription": "Possibilidade de cursar a graduação em inglês, com disciplinas obrigatórias e parte das eletivas ministradas nesse idioma.",
-      "type": "internacionalização",
-      "tags": ["inglês", "curso em inglês", "mercado internacional", "graduação diurna"],
-      "details": {
-        "availability": "Disponível apenas para alunos da graduação diurna.",
-        "benefits": [
-          "Domínio de termos técnicos em inglês",
-          "Preparação para o mercado internacional",
-          "Formação internacional no Brasil, com investimento em moeda local"
-        ]
-      }
-    },
-    {
-      "id": "excelencia-academica",
-      "title": "Excelência acadêmica",
-      "shortDescription": "Conteúdo atualizado, metodologias inovadoras e corpo docente altamente qualificado, com professores brasileiros e estrangeiros formados em escolas de referência.",
-      "type": "qualidade acadêmica",
-      "tags": ["excelência", "professores", "metodologia", "qualidade acadêmica"]
-    },
-    {
-      "id": "pesquisa-e-conhecimento",
-      "title": "Pesquisa e conhecimento",
-      "shortDescription": "A escola conta com centros de estudos que conectam pesquisa aplicada e prática, produzindo conhecimento em diferentes áreas de gestão e negócios.",
-      "type": "pesquisa",
-      "tags": ["pesquisa", "centros de estudo", "conhecimento", "produção acadêmica"],
-      "details": {
-        "studyCenters": "20 centros de estudos",
-        "researchLines": "10 linhas de pesquisa"
-      }
-    }
-  ]
-},
-
     {
       "id": "administracao-publica-sp",
       "name": "Administração Pública",
@@ -243,9 +395,21 @@
       "period": "Integral do 1º ao 6º semestre; matutino no 7º e 8º semestres.",
       "tuition": "R$ 7.560,00/mês durante 4 anos (*2026.1)",
       "campus": "Campus FGV EAESP — Av. 9 de Julho, 2029, Bela Vista, São Paulo, SP",
-      "admissions": ["Vestibular FGV", "ENEM", "Internacional", "Transferência e/ou Portador de Diploma", "Vestibular por Demanda Social e Diversidade"],
+      "admissions": [
+        "Vestibular FGV",
+        "ENEM",
+        "Internacional",
+        "Transferência e/ou Portador de Diploma",
+        "Vestibular por Demanda Social e Diversidade"
+      ],
       "summary": "Curso voltado à formação de profissionais capazes de analisar políticas públicas e atuar na transformação social.",
-      "tags": ["políticas públicas", "governo", "impacto social", "São Paulo", "EAESP"]
+      "tags": [
+        "políticas públicas",
+        "governo",
+        "impacto social",
+        "São Paulo",
+        "EAESP"
+      ]
     },
     {
       "id": "direito-sp",
@@ -260,10 +424,25 @@
       "period": "Consultar página do curso",
       "tuition": "Consultar página do curso",
       "campus": "São Paulo",
-      "admissions": ["Vestibular FGV", "ENEM", "Internacional", "Vestibular por Demanda Social e Diversidade"],
+      "admissions": [
+        "Vestibular FGV",
+        "ENEM",
+        "Internacional",
+        "Vestibular por Demanda Social e Diversidade"
+      ],
       "summary": "Direito em São Paulo, com processo seletivo próprio em duas fases, incluindo provas escritas e entrevista, conforme página da modalidade Vestibular FGV.",
-      "admissionDates": { "Vestibular FGV": "27/07 a 16/09/2026", "ENEM": "Em breve", "Internacional": "Em breve" },
-      "tags": ["direito", "jurídico", "São Paulo", "dupla graduação", "Direito SP"]
+      "admissionDates": {
+        "Vestibular FGV": "27/07 a 16/09/2026",
+        "ENEM": "Em breve",
+        "Internacional": "Em breve"
+      },
+      "tags": [
+        "direito",
+        "jurídico",
+        "São Paulo",
+        "dupla graduação",
+        "Direito SP"
+      ]
     },
     {
       "id": "economia-sp",
@@ -278,9 +457,19 @@
       "period": "Consultar página do curso",
       "tuition": "Consultar página do curso",
       "campus": "São Paulo",
-      "admissions": ["Vestibular FGV", "ENEM", "Internacional"],
+      "admissions": [
+        "Vestibular FGV",
+        "ENEM",
+        "Internacional"
+      ],
       "summary": "Economia na FGV EESP, com ênfases em Finanças, Macroeconomia, Políticas Públicas, Economia Política, Negócios e Acadêmica.",
-      "tags": ["economia", "finanças", "políticas públicas", "São Paulo", "EESP"]
+      "tags": [
+        "economia",
+        "finanças",
+        "políticas públicas",
+        "São Paulo",
+        "EESP"
+      ]
     },
     {
       "id": "relacoes-internacionais-sp",
@@ -295,9 +484,19 @@
       "period": "Integral",
       "tuition": "R$ 6.688,00 (*2026.1)",
       "campus": "Campus FGV RI — Rua Itapeva, 474, Bela Vista, São Paulo",
-      "admissions": ["Vestibular FGV", "ENEM", "Internacional"],
+      "admissions": [
+        "Vestibular FGV",
+        "ENEM",
+        "Internacional"
+      ],
       "summary": "Curso para quem busca carreira global, com formação para organismos internacionais, consultorias, bancos, multinacionais, pesquisa aplicada e governo.",
-      "tags": ["internacional", "carreira global", "política", "São Paulo", "RI"]
+      "tags": [
+        "internacional",
+        "carreira global",
+        "política",
+        "São Paulo",
+        "RI"
+      ]
     },
     {
       "id": "administracao-rj",
@@ -312,9 +511,19 @@
       "period": "Consultar página do curso",
       "tuition": "Consultar página do curso",
       "campus": "Rio de Janeiro",
-      "admissions": ["Vestibular FGV", "ENEM", "Internacional", "Transferência e/ou Portador de Diploma"],
+      "admissions": [
+        "Vestibular FGV",
+        "ENEM",
+        "Internacional",
+        "Transferência e/ou Portador de Diploma"
+      ],
       "summary": "Curso estruturado em rigor científico, internacionalização e alinhamento às práticas contemporâneas de mercado.",
-      "tags": ["gestão", "negócios", "Rio de Janeiro", "EBAPE"]
+      "tags": [
+        "gestão",
+        "negócios",
+        "Rio de Janeiro",
+        "EBAPE"
+      ]
     },
     {
       "id": "ciencia-dados-ia-rj",
@@ -329,12 +538,27 @@
       "period": "Diurno",
       "tuition": "R$ 4.000,00 (*2026.1)",
       "campus": "Praia de Botafogo, 190, 5º andar — Rio de Janeiro, RJ",
-      "admissions": ["Vestibular FGV", "ENEM", "Internacional", "Transferência e/ou Portador de Diploma"],
+      "admissions": [
+        "Vestibular FGV",
+        "ENEM",
+        "Internacional",
+        "Transferência e/ou Portador de Diploma"
+      ],
       "summary": "Curso da FGV EMAp voltado a carreira em tecnologia, dados, bancos, varejo, consultoria, organizações e pesquisa.",
-      "admissionDates": { "Vestibular FGV": "27/07 a 16/09/2026", "ENEM": "Em breve", "Internacional": "Em breve" },
+      "admissionDates": {
+        "Vestibular FGV": "27/07 a 16/09/2026",
+        "ENEM": "Em breve",
+        "Internacional": "Em breve"
+      },
       "examDates": "18 e 19/10/2026",
       "resultDate": "09/11/2026",
-      "tags": ["dados", "IA", "tecnologia", "Rio de Janeiro", "EMAp"]
+      "tags": [
+        "dados",
+        "IA",
+        "tecnologia",
+        "Rio de Janeiro",
+        "EMAp"
+      ]
     },
     {
       "id": "ciencias-sociais-rj",
@@ -349,9 +573,19 @@
       "period": "Consultar página do curso",
       "tuition": "Consultar página do curso",
       "campus": "Rio de Janeiro",
-      "admissions": ["Vestibular FGV", "ENEM", "Internacional"],
+      "admissions": [
+        "Vestibular FGV",
+        "ENEM",
+        "Internacional"
+      ],
       "summary": "Curso da FGV CPDOC, com possibilidades de dupla graduação e formação complementar em áreas como Direito, Matemática Aplicada, Ciência de Dados, Economia, Comunicação Digital e Administração.",
-      "tags": ["ciências sociais", "sociedade", "pesquisa", "Rio de Janeiro", "CPDOC"]
+      "tags": [
+        "ciências sociais",
+        "sociedade",
+        "pesquisa",
+        "Rio de Janeiro",
+        "CPDOC"
+      ]
     },
     {
       "id": "comunicacao-digital-rj",
@@ -366,9 +600,19 @@
       "period": "Consultar página do curso",
       "tuition": "Consultar página do curso",
       "campus": "Rio de Janeiro",
-      "admissions": ["Vestibular FGV", "ENEM", "Internacional", "Transferência e/ou Portador de Diploma"],
+      "admissions": [
+        "Vestibular FGV",
+        "ENEM",
+        "Internacional",
+        "Transferência e/ou Portador de Diploma"
+      ],
       "summary": "Curso da FGV Comunicação no Rio de Janeiro, com modalidades Vestibular FGV, ENEM e Internacional indicadas na página do curso.",
-      "tags": ["comunicação", "digital", "mídia", "Rio de Janeiro"]
+      "tags": [
+        "comunicação",
+        "digital",
+        "mídia",
+        "Rio de Janeiro"
+      ]
     },
     {
       "id": "direito-rj",
@@ -383,10 +627,24 @@
       "period": "Integral",
       "tuition": "R$ 6.880,00 (*2026.1)",
       "campus": "FGV Botafogo — Praia de Botafogo, 190, Botafogo/RJ",
-      "admissions": ["Vestibular FGV", "ENEM", "Internacional", "Transferência e/ou Portador de Diploma"],
+      "admissions": [
+        "Vestibular FGV",
+        "ENEM",
+        "Internacional",
+        "Transferência e/ou Portador de Diploma"
+      ],
       "summary": "Direito no Rio de Janeiro, com ingresso 2027.1 e modalidades Vestibular FGV, ENEM e Internacional quando disponíveis.",
-      "admissionDates": { "Vestibular FGV": "27/07 a 16/09/2026", "ENEM": "Em breve", "Internacional": "Em breve" },
-      "tags": ["direito", "jurídico", "Rio de Janeiro", "Direito Rio"]
+      "admissionDates": {
+        "Vestibular FGV": "27/07 a 16/09/2026",
+        "ENEM": "Em breve",
+        "Internacional": "Em breve"
+      },
+      "tags": [
+        "direito",
+        "jurídico",
+        "Rio de Janeiro",
+        "Direito Rio"
+      ]
     },
     {
       "id": "economia-rj",
@@ -401,9 +659,19 @@
       "period": "Integral",
       "tuition": "Consultar página do curso",
       "campus": "Rio de Janeiro",
-      "admissions": ["Vestibular FGV", "ENEM", "Internacional", "Transferência e/ou Portador de Diploma"],
+      "admissions": [
+        "Vestibular FGV",
+        "ENEM",
+        "Internacional",
+        "Transferência e/ou Portador de Diploma"
+      ],
       "summary": "Economia na FGV EPGE, no Rio de Janeiro, com processo seletivo 2027.1 indicado na página do curso.",
-      "tags": ["economia", "finanças", "Rio de Janeiro", "EPGE"]
+      "tags": [
+        "economia",
+        "finanças",
+        "Rio de Janeiro",
+        "EPGE"
+      ]
     },
     {
       "id": "matematica-aplicada-rj",
@@ -418,9 +686,20 @@
       "period": "Consultar página do curso",
       "tuition": "Consultar página do curso",
       "campus": "Rio de Janeiro",
-      "admissions": ["Vestibular FGV", "ENEM", "Internacional", "Transferência e/ou Portador de Diploma"],
+      "admissions": [
+        "Vestibular FGV",
+        "ENEM",
+        "Internacional",
+        "Transferência e/ou Portador de Diploma"
+      ],
       "summary": "Curso da FGV EMAp para atuação em setores estratégicos, consultoria e pesquisa acadêmica.",
-      "tags": ["matemática", "dados", "modelagem", "Rio de Janeiro", "EMAp"]
+      "tags": [
+        "matemática",
+        "dados",
+        "modelagem",
+        "Rio de Janeiro",
+        "EMAp"
+      ]
     },
     {
       "id": "administracao-df",
@@ -435,10 +714,26 @@
       "period": "Integral",
       "tuition": "R$ 5.931,02 (*2026.1)",
       "campus": "Campus FGV EPPG — SGAN Quadra 602, Módulos A B e C, Asa Norte, Brasília - DF",
-      "admissions": ["Vestibular FGV", "ENEM", "Internacional", "Olimpíadas", "Vestibular por Demanda Social e Diversidade", "Transferência e/ou Portador de Diploma"],
+      "admissions": [
+        "Vestibular FGV",
+        "ENEM",
+        "Internacional",
+        "Olimpíadas",
+        "Vestibular por Demanda Social e Diversidade",
+        "Transferência e/ou Portador de Diploma"
+      ],
       "summary": "Administração de Empresas em Brasília, com formação para organizações privadas e públicas.",
-      "admissionDates": { "Vestibular FGV": "27/07 a 16/09/2026", "Transferência e/ou Portador de Diploma": "13/05 a 17/07/2026", "ENEM": "Em breve" },
-      "tags": ["gestão", "negócios", "Brasília", "EPPG"]
+      "admissionDates": {
+        "Vestibular FGV": "27/07 a 16/09/2026",
+        "Transferência e/ou Portador de Diploma": "13/05 a 17/07/2026",
+        "ENEM": "Em breve"
+      },
+      "tags": [
+        "gestão",
+        "negócios",
+        "Brasília",
+        "EPPG"
+      ]
     },
     {
       "id": "administracao-publica-df",
@@ -453,9 +748,19 @@
       "period": "Consultar página do curso",
       "tuition": "Consultar página do curso",
       "campus": "Brasília",
-      "admissions": ["Vestibular FGV", "ENEM", "Internacional", "Transferência e/ou Portador de Diploma"],
+      "admissions": [
+        "Vestibular FGV",
+        "ENEM",
+        "Internacional",
+        "Transferência e/ou Portador de Diploma"
+      ],
       "summary": "Administração Pública em Brasília, voltada a formação para impacto público e atuação em contextos institucionais.",
-      "tags": ["políticas públicas", "governo", "Brasília", "EPPG"]
+      "tags": [
+        "políticas públicas",
+        "governo",
+        "Brasília",
+        "EPPG"
+      ]
     }
   ],
   "materials": [
@@ -484,7 +789,6 @@
       "url": "https://vestibular.fgv.br/eventos"
     }
   ],
-  
   "sampleQuestions": [
     "posso usar minha nota do Enem para Direito em SP?",
     "quais cursos existem no Rio de Janeiro?",
@@ -494,7 +798,6 @@
     "quero estudar algo com dados e tecnologia",
     "quero conhecer a FGV antes de me inscrever"
   ],
-
   "scholarships": {
     "title": "Bolsas de estudo",
     "intro": "A FGV oferece diferentes modalidades de bolsas para estudantes de graduação, com critérios que podem variar por curso, cidade e processo seletivo.",
@@ -511,7 +814,9 @@
           "Estudantes com excelente desempenho escolar",
           "Candidatos identificados pela Olimpíada Brasileira de Matemática das Escolas Públicas"
         ],
-        "cities": ["Rio de Janeiro"],
+        "cities": [
+          "Rio de Janeiro"
+        ],
         "eligibility": [
           "Ter estudado em escola pública",
           "Apresentar excelente desempenho escolar",
@@ -544,7 +849,11 @@
           "Estudantes com bom rendimento acadêmico",
           "Estudantes com necessidade econômico-financeira"
         ],
-        "cities": ["Rio de Janeiro", "São Paulo", "Brasília"],
+        "cities": [
+          "Rio de Janeiro",
+          "São Paulo",
+          "Brasília"
+        ],
         "eligibility": [
           "Demonstrar bom rendimento acadêmico e/ou necessidade econômico-financeira",
           "Apresentar documentação para análise da Comissão de Bolsas"
@@ -575,7 +884,11 @@
           "Estudantes com necessidade financeira e social",
           "Candidatos ou alunos que atendam aos critérios definidos por cada curso"
         ],
-        "cities": ["Rio de Janeiro", "São Paulo", "Brasília"],
+        "cities": [
+          "Rio de Janeiro",
+          "São Paulo",
+          "Brasília"
+        ],
         "eligibility": [
           "Comprovar necessidade financeira e social",
           "Enviar documentação exigida",
@@ -608,7 +921,11 @@
           "Candidatos aprovados nos processos seletivos da FGV",
           "Estudantes com desempenho compatível com os critérios de mérito"
         ],
-        "cities": ["Rio de Janeiro", "São Paulo", "Brasília"],
+        "cities": [
+          "Rio de Janeiro",
+          "São Paulo",
+          "Brasília"
+        ],
         "eligibility": [
           "Ser aprovado no processo seletivo da FGV",
           "Atender aos critérios de mérito definidos por cada curso"
@@ -630,135 +947,135 @@
       }
     ]
   },
-
-"graduationEvents": {
-  "title": "Eventos da graduação",
-  "intro": "Participe de eventos da FGV para conhecer os cursos, viver a experiência universitária e tirar dúvidas sobre a graduação.",
-  "events": [
-    {
-      "id": "semana-imersiva-2026-rio",
-      "name": "Semana Imersiva 2026 - Rio de Janeiro",
-      "type": "Semana Imersiva",
-      "city": "Rio de Janeiro",
-      "state": "RJ",
-      "date": "2026-07-27",
-      "displayDate": "27 de julho",
-      "startTime": "09:00",
-      "endTime": "16:00",
-      "displayTime": "09h00 às 16h00",
-      "description": "Evento para candidatos interessados em conhecer a experiência universitária da FGV no Rio de Janeiro.",
-      "cta": {
-        "label": "Participe",
-        "url": ""
+  "graduationEvents": {
+    "title": "Eventos da graduação",
+    "intro": "Participe de eventos da FGV para conhecer os cursos, viver a experiência universitária e tirar dúvidas sobre a graduação.",
+    "events": [
+      {
+        "id": "semana-imersiva-2026-rio",
+        "name": "Semana Imersiva 2026 - Rio de Janeiro",
+        "type": "Semana Imersiva",
+        "city": "Rio de Janeiro",
+        "state": "RJ",
+        "date": "2026-07-27",
+        "displayDate": "27 de julho",
+        "startTime": "09:00",
+        "endTime": "16:00",
+        "displayTime": "09h00 às 16h00",
+        "description": "Evento para candidatos interessados em conhecer a experiência universitária da FGV no Rio de Janeiro.",
+        "cta": {
+          "label": "Participe",
+          "url": ""
+        },
+        "tags": [
+          "evento",
+          "graduação",
+          "semana imersiva",
+          "rio de janeiro",
+          "experiência universitária"
+        ],
+        "status": "active"
       },
-      "tags": [
-        "evento",
-        "graduação",
-        "semana imersiva",
-        "rio de janeiro",
-        "experiência universitária"
-      ]
-    },
-    {
-      "id": "semana-imersiva-aulas-tematicas-sao-paulo",
-      "name": "Semana Imersiva com aulas temáticas | São Paulo",
-      "type": "Semana Imersiva",
-      "city": "São Paulo",
-      "state": "SP",
-      "date": "2026-07-20",
-      "displayDate": "20 de julho",
-      "startTime": "09:00",
-      "endTime": "11:00",
-      "displayTime": "09h00 às 11h00",
-      "description": "Evento com aulas temáticas para candidatos interessados em conhecer a graduação da FGV em São Paulo.",
-      "cta": {
-        "label": "Participe",
-        "url": ""
+      {
+        "id": "semana-imersiva-aulas-tematicas-sao-paulo",
+        "name": "Semana Imersiva com aulas temáticas | São Paulo",
+        "type": "Semana Imersiva",
+        "city": "São Paulo",
+        "state": "SP",
+        "date": "2026-07-20",
+        "displayDate": "20 de julho",
+        "startTime": "09:00",
+        "endTime": "11:00",
+        "displayTime": "09h00 às 11h00",
+        "description": "Evento com aulas temáticas para candidatos interessados em conhecer a graduação da FGV em São Paulo.",
+        "cta": {
+          "label": "Participe",
+          "url": ""
+        },
+        "tags": [
+          "evento",
+          "graduação",
+          "semana imersiva",
+          "aulas temáticas",
+          "são paulo"
+        ],
+        "status": "active"
       },
-      "tags": [
-        "evento",
-        "graduação",
-        "semana imersiva",
-        "aulas temáticas",
-        "são paulo"
-      ]
-    },
-    {
-      "id": "experiencia-fgv-2026-brasilia",
-      "name": "Experiência FGV 2026 | Brasília",
-      "type": "Experiência FGV",
-      "city": "Brasília",
-      "state": "DF",
-      "date": "2026-08-27",
-      "displayDate": "27 de agosto",
-      "startTime": "14:00",
-      "endTime": "17:15",
-      "displayTime": "14h00 às 17h15",
-      "description": "Evento para candidatos conhecerem de perto a experiência da graduação FGV em Brasília.",
-      "cta": {
-        "label": "Participe",
-        "url": ""
+      {
+        "id": "experiencia-fgv-2026-brasilia",
+        "name": "Experiência FGV 2026 | Brasília",
+        "type": "Experiência FGV",
+        "city": "Brasília",
+        "state": "DF",
+        "date": "2026-08-27",
+        "displayDate": "27 de agosto",
+        "startTime": "14:00",
+        "endTime": "17:15",
+        "displayTime": "14h00 às 17h15",
+        "description": "Evento para candidatos conhecerem de perto a experiência da graduação FGV em Brasília.",
+        "cta": {
+          "label": "Participe",
+          "url": ""
+        },
+        "tags": [
+          "evento",
+          "graduação",
+          "experiência fgv",
+          "brasília",
+          "vida universitária"
+        ],
+        "status": "active"
       },
-      "tags": [
-        "evento",
-        "graduação",
-        "experiência fgv",
-        "brasília",
-        "vida universitária"
-      ]
-    },
-    {
-      "id": "experiencia-fgv-rio-de-janeiro",
-      "name": "Experiência FGV - Rio de Janeiro",
-      "type": "Experiência FGV",
-      "city": "Rio de Janeiro",
-      "state": "RJ",
-      "date": "2026-08-29",
-      "displayDate": "29 de agosto",
-      "startTime": "09:00",
-      "endTime": "15:00",
-      "displayTime": "09h00 às 15h00",
-      "description": "Evento para candidatos conhecerem cursos, estrutura e experiência universitária da FGV no Rio de Janeiro.",
-      "cta": {
-        "label": "Participe",
-        "url": ""
+      {
+        "id": "experiencia-fgv-rio-de-janeiro",
+        "name": "Experiência FGV - Rio de Janeiro",
+        "type": "Experiência FGV",
+        "city": "Rio de Janeiro",
+        "state": "RJ",
+        "date": "2026-08-29",
+        "displayDate": "29 de agosto",
+        "startTime": "09:00",
+        "endTime": "15:00",
+        "displayTime": "09h00 às 15h00",
+        "description": "Evento para candidatos conhecerem cursos, estrutura e experiência universitária da FGV no Rio de Janeiro.",
+        "cta": {
+          "label": "Participe",
+          "url": ""
+        },
+        "tags": [
+          "evento",
+          "graduação",
+          "experiência fgv",
+          "rio de janeiro",
+          "vida universitária"
+        ],
+        "status": "active"
       },
-      "tags": [
-        "evento",
-        "graduação",
-        "experiência fgv",
-        "rio de janeiro",
-        "vida universitária"
-      ]
-    },
-    {
-      "id": "experiencia-fgv-sao-paulo",
-      "name": "Experiência FGV - São Paulo",
-      "type": "Experiência FGV",
-      "city": "São Paulo",
-      "state": "SP",
-      "date": "2026-08-29",
-      "displayDate": "29 de agosto",
-      "startTime": "08:30",
-      "endTime": "13:30",
-      "displayTime": "08h30 às 13h30",
-      "description": "Evento para candidatos conhecerem cursos, estrutura e experiência universitária da FGV em São Paulo.",
-      "cta": {
-        "label": "Participe",
-        "url": ""
-      },
-      "tags": [
-        "evento",
-        "graduação",
-        "experiência fgv",
-        "são paulo",
-        "vida universitária"
-      ]
-    }
-  ]
-}
-
-
-
-
+      {
+        "id": "experiencia-fgv-sao-paulo",
+        "name": "Experiência FGV - São Paulo",
+        "type": "Experiência FGV",
+        "city": "São Paulo",
+        "state": "SP",
+        "date": "2026-08-29",
+        "displayDate": "29 de agosto",
+        "startTime": "08:30",
+        "endTime": "13:30",
+        "displayTime": "08h30 às 13h30",
+        "description": "Evento para candidatos conhecerem cursos, estrutura e experiência universitária da FGV em São Paulo.",
+        "cta": {
+          "label": "Participe",
+          "url": ""
+        },
+        "tags": [
+          "evento",
+          "graduação",
+          "experiência fgv",
+          "são paulo",
+          "vida universitária"
+        ],
+        "status": "active"
+      }
+    ]
+  }
 }
