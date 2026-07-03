@@ -1,8 +1,6 @@
-<!doctype html>
-<html lang="pt-BR">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+<html lang="pt-BR"><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Vestibular FGV — encontre seu caminho</title>
   <style>
     :root {
@@ -685,7 +683,7 @@
     </div>
     <div class="top-search" id="topSearch">
       <form class="query-box" id="topQueryForm">
-        <input class="query-input" id="topQueryInput" autocomplete="off" placeholder="Faça outra busca: curso, cidade, ENEM, edital, prova..." />
+        <input class="query-input" id="topQueryInput" autocomplete="off" placeholder="Faça outra busca: curso, cidade, ENEM, edital, prova...">
         <button class="send" id="topSendBtn" type="submit">Buscar</button>
       </form>
     </div>
@@ -699,7 +697,7 @@
         <p class="lead">Pergunte do seu jeito. Você pode buscar cursos, comparar opções, ver formas de ingresso, consultar provas anteriores ou entender o próximo passo para se inscrever.</p>
 
         <form class="query-box" id="queryForm">
-          <input class="query-input" id="queryInput" autocomplete="off" placeholder="Ex.: posso usar minha nota do Enem para Direito em SP?" />
+          <input class="query-input" id="queryInput" autocomplete="off" placeholder="Ex.: posso usar minha nota do Enem para Direito em SP?">
           <button class="send" id="sendBtn" type="submit">Buscar</button>
         </form>
         <div class="suggestions" id="suggestions"></div>
@@ -780,28 +778,42 @@
         .replaceAll("'", "&#039;");
     }
 
+    function courseSearchText(course = {}) {
+      const tags = Array.isArray(course.tags) ? course.tags : [];
+      return normalize([
+        course.name,
+        course.displayName,
+        course.school,
+        course.city,
+        course.state,
+        ...tags
+      ].filter(Boolean).join(" "));
+    }
+
     function matchCourses(entities = {}) {
-      const requestedCourses = (entities.courses || []).map(normalize);
-      const requestedCities = (entities.cities || []).map(normalize);
-      let matched = DATA.courses.filter((course) => {
-        const courseText = normalize(`${course.name} ${course.displayName} ${course.school} ${course.tags.join(" ")}`);
-        const courseOk = !requestedCourses.length || requestedCourses.some((item) => courseText.includes(item) || item.includes(normalize(course.name)));
-        const cityOk = !requestedCities.length || requestedCities.includes(normalize(course.city)) || requestedCities.includes(normalize(course.state));
+      const requestedCourses = Array.isArray(entities.courses) ? entities.courses.map(normalize).filter(Boolean) : [];
+      const requestedCities = Array.isArray(entities.cities) ? entities.cities.map(normalize).filter(Boolean) : [];
+      const coursesBase = Array.isArray(DATA?.courses) ? DATA.courses : [];
+
+      let matched = coursesBase.filter((course) => {
+        const courseText = courseSearchText(course);
+        const courseOk = !requestedCourses.length || requestedCourses.some((item) => courseText.includes(item) || item.includes(normalize(course.name || course.displayName || "")));
+        const cityOk = !requestedCities.length || requestedCities.includes(normalize(course.city || "")) || requestedCities.includes(normalize(course.state || ""));
         return courseOk && cityOk;
       });
 
       if (!matched.length && requestedCities.length) {
-        matched = DATA.courses.filter((course) => requestedCities.includes(normalize(course.city)) || requestedCities.includes(normalize(course.state)));
+        matched = coursesBase.filter((course) => requestedCities.includes(normalize(course.city || "")) || requestedCities.includes(normalize(course.state || "")));
       }
 
       if (!matched.length && requestedCourses.length) {
-        matched = DATA.courses.filter((course) => {
-          const courseText = normalize(`${course.name} ${course.displayName} ${course.school} ${course.tags.join(" ")}`);
-          return requestedCourses.some((item) => courseText.includes(item) || item.includes(normalize(course.name)));
+        matched = coursesBase.filter((course) => {
+          const courseText = courseSearchText(course);
+          return requestedCourses.some((item) => courseText.includes(item) || item.includes(normalize(course.name || course.displayName || "")));
         });
       }
 
-      if (!matched.length) matched = DATA.courses.slice(0, 6);
+      if (!matched.length) matched = coursesBase.slice(0, 6);
       return matched.slice(0, 8);
     }
 
@@ -863,9 +875,9 @@
         renderPlan(plan, message);
         setStatus("", false);
       } catch (error) {
-        console.error("Falha na busca com IA:", error);
+        console.error("Falha na busca ou na montagem da interface:", error);
         LAST_PLAN = null;
-        setStatus("A busca não respondeu agora. Verifique a variável OPENAI_API_KEY na Vercel e faça um novo deploy. Nesta versão, não há resposta pré-programada.", true);
+        setStatus("A busca não conseguiu montar a resposta agora. Confira a aba Console/Network para ver o detalhe do erro.", true);
       } finally {
         $("#sendBtn").disabled = false;
         $("#topSendBtn").disabled = false;
@@ -988,17 +1000,22 @@
       const components = order.filter((name) => incoming.includes(name));
 
       stack.innerHTML = components.map((component) => {
-        if (component === "course_cards") return renderCourseCards(plan);
-        if (component === "course_compare") return renderCourseCompare(plan);
-        if (component === "admission_options") return renderAdmissionOptions(plan);
-        if (component === "timeline") return renderTimeline(plan);
-        if (component === "prep_materials") return renderPrepMaterials(plan);
-        if (component === "source_links") return renderSourceLinks(plan);
-        if (component === "faq") return renderFaq(plan);
-        if (component === "next_steps") return renderNextSteps(plan);
-        if (component === "lead_form") return renderLeadForm(plan);
-        if (component === "warning") return renderWarning(plan);
-        return "";
+        try {
+          if (component === "course_cards") return renderCourseCards(plan);
+          if (component === "course_compare") return renderCourseCompare(plan);
+          if (component === "admission_options") return renderAdmissionOptions(plan);
+          if (component === "timeline") return renderTimeline(plan);
+          if (component === "prep_materials") return renderPrepMaterials(plan);
+          if (component === "source_links") return renderSourceLinks(plan);
+          if (component === "faq") return renderFaq(plan);
+          if (component === "next_steps") return renderNextSteps(plan);
+          if (component === "lead_form") return renderLeadForm(plan);
+          if (component === "warning") return renderWarning(plan);
+          return "";
+        } catch (error) {
+          console.error(`Erro ao montar o componente ${component}:`, error);
+          return "";
+        }
       }).join("");
     }
 
@@ -1313,5 +1330,6 @@
 
     init();
   </script>
-</body>
-</html>
+
+
+</body></html>
